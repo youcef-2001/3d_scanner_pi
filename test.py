@@ -26,7 +26,7 @@ if __name__ == "__main__":
         picam2 = Picamera2()
         picam2.configure(picam2.create_video_configuration())
         picam2.start()
-        time.sleep(2)
+        time.sleep(1)
 
         os.makedirs("./images", exist_ok=True)
         i = 0

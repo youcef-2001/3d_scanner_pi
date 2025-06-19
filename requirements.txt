@@ -7,3 +7,8 @@ RPi.GPIO
 #camera
 picamera2
 opencv-python
+
+
+# server stream
+
+cv2
