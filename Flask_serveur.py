@@ -11,22 +11,25 @@ app = Flask(__name__)  # ✅ Utilise __name__ ici
 def control_laser():
     state = request.json.get('state')
    # GPIO.output(LASER_PIN, GPIO.HIGH if state == 'on' else GPIO.LOW)
+    print("laser status ok")
     return {'status': 'ok'}
 
 @app.route('/camera', methods=['POST'])
 def control_camera():
     state = request.json.get('state')
     # TODO: lancer une action sur la caméra, ex: via subprocess
+    print("camera status ok")
     return {'status': 'ok'}
 
 @app.route('/tf-luna', methods=['GET'])
 def get_distance():
     # TODO: implémenter la lecture du capteur TF-Luna via UART
     distance = read_tf_luna()  # Cette fonction doit être définie
+    print(f"tf-luna distance: {distance}")
     return {'distance': distance}
 
 def read_tf_luna():
-    # Dummy exemple : à remplacer par ton code UART
+    # Dummy exemple : à remplacer par ton code I2C
     return 123.45
 
 if __name__ == '__main__':  # ✅ Bonne syntaxe
