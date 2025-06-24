@@ -27,8 +27,14 @@ apChannel="$apChannelDefault"
 apSsid="Scanner_3D"
 apPassphrase="12345678*"
 apPasswordConfig=""
+# FIX: for https://github.com/idev1/rpihotspot/issues/12#issuecomment-605552834
+if [ ! -z "$( hostname )" ]; then 
+    hostName="$( hostname )"
+fi
 
-workDir="/home/pi"
+echo "[INFO]: Hostname is: $hostName"
+
+workDir="/home/$hostName"
 installDir="$workDir/network-setup"
 logDir="$installDir/log"
 execDir="$installDir/bin"
@@ -53,12 +59,6 @@ apInterfaceName="uap0"
 hostNameDefault="raspberrypi"
 hostName="$hostNameDefault"
 
-# FIX: for https://github.com/idev1/rpihotspot/issues/12#issuecomment-605552834
-if [ ! -z "$( hostname )" ]; then 
-    hostName="$( hostname )"
-fi
-
-echo "[INFO]: Hostname is: $hostName"
 
 function setWlanDetails()
 {
