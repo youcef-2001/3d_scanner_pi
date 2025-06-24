@@ -3,6 +3,15 @@ import os
 import RPi.GPIO as GPIO
 import time
 from datetime import datetime
+import socket
+import getpass
+
+# Récupérer le nom d'hôte (hostname)
+#hostname = socket.gethostname()
+#print(f"Nom d'hôte de la machine : {hostname}")
+
+# Récupérer le nom de l'utilisateur courant
+username = getpass.getuser()
 
 # Configuration des broches physiques (BOARD)
 LASER_PIN = 37  # GPIO26
@@ -25,7 +34,7 @@ if __name__ == "__main__":
     try:
         setup()
         timestamp = datetime.now().strftime("acquisition_%d_%m_%H_%M")
-        save_dir = os.path.join("../images", timestamp)
+        save_dir = os.path.join(f"/home/{username}/images", timestamp)
         os.makedirs(save_dir, exist_ok=True)
         picam2 = Picamera2()
         config = picam2.create_still_configuration(
