@@ -33,13 +33,13 @@ installDir="$workDir/network-setup"
 logDir="$installDir/log"
 execDir="$installDir/bin"
 downloadDir="$installDir/downloads"
-netStartFile="$execDir/netStart"
+netStartFile="$execDir/netStart.sh"
 netStopFile="$execDir/netStop.sh"
 netLogFile="$logDir/network.log"
 netStopServiceFile="/etc/systemd/system/netStop.service"
 netStationConfigFile="/etc/network/interfaces.d/station"
 netShutdownFlagFile="$logDir/netShutdownFlag"
-shutdownRecoveryFile="$execDir/shutdownRecovery"
+shutdownRecoveryFile="$execDir/shutdownRecovery.sh"
 rcLocalLogFile="$logDir/rc.local.log"
 
 rebootFlag=true
@@ -682,7 +682,7 @@ Description=Stops all the WiFi dependencies: hostapd, dnsmasq and dhcpcd.
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/bin/true
+ExecStart=$netStartFile
 ExecStop=$netStopFile
 
 [Install]
