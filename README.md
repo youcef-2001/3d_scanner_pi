@@ -35,4 +35,5 @@ Le Raspberry Pi agit à la fois comme point d'accès (AP) et client Wi-Fi.
 - Documentation détaillée sur l'installation et l'utilisation
 
 ---
-N'hésitez pas à proposer des améliorations ou à signaler des problèmes via les
+N'hésitez pas à proposer des améliorations en nous contactons via nos addresses mails respectives :
+``` ybaleh13@gmail.com|```
