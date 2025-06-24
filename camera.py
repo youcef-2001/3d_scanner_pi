@@ -2,7 +2,8 @@ from picamera2 import Picamera2
 import os
 
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (1280, 720)}))
+# demarrer la camera avec 5MP
+picam2.configure(picam2.create_video_configuration(main={"size":  (2592, 1944)
 picam2.start()
 
 os.makedirs("./images", exist_ok=True)

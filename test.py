@@ -31,7 +31,7 @@ if __name__ == "__main__":
         config = picam2.create_still_configuration(
         main={"size": (2592, 1944)},  # 5MP
         controls={
-        "ExposureTime": 5000,        # Légèrement plus long (12 ms) = plus de lumière sans trop de flou
+        "ExposureTime": 5000,         # Légèrement plus long (12 ms) = plus de lumière sans trop de flou
         "AnalogueGain": 0.5,          # Gain minimum = bruit minimal (mais dépend de l'éclairage)
         "NoiseReductionMode": 1,      # High quality (tu es bon ici)
         "Sharpness": 1.7,             # Pousse un peu plus pour renforcer les bords
