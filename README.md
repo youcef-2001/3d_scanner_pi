@@ -1,23 +1,38 @@
 # 3d_scanner_pi
 
+Ce projet vise à créer un scanner 3D basé sur un Raspberry Pi 3.
 
-ceci est l'arborescence du projet de creation d'un scanneur 3d avec un raspberypi 3
+## Description
 
-l'application front qui s'occupera de piloter l'appareil hardware est dans un autre repository qui sera ajouter ici bientot
+Ce dépôt contient le code backend pour la gestion du matériel du scanner 3D, ainsi qu'un serveur Flask pour la partie API.  
+L'application frontend permettant de piloter l'appareil se trouve dans un autre dépôt (lien à venir).
 
+Une base de données Supabase est utilisée pour stocker les utilisateurs et les fichiers 3D (au format `.stl`).
 
-en ce qui concerne ce code il contientn pour le moment des bourt de code pour communiquer avec les composants  hardware et aussi un serveur flask preparatif pour faire le back end
-a noter egalement qu'une base de donne qui contient les tables utilisateurs et ficheirs est sur supabase contenant egalement les ficheirs en tant que .stl
+## Fonctionnalités
 
-quelques commandes utiles :
+- Communication avec les composants hardware du scanner 3D
+- Serveur Flask pour l'API backend
+- Stockage des utilisateurs et fichiers sur Supabase
 
+## Commandes utiles
 
-le raspberry est cense etre a la fois un AP et un Client wifi  :
-- pour lancer l'ap il faudra run cette commande 
-depuis ce dossier ```/home/pi/network-setup/log```:
+Le Raspberry Pi agit à la fois comme point d'accès (AP) et client Wi-Fi.
 
-``` sudo netStart```
+- Pour lancer le point d'accès, exécutez depuis le dossier `/home/pi/network-setup/log` :
+  ```bash
+  sudo netStart
+  ```
 
-- pour l'arreter dans le mem dossier faite 
+- Pour arrêter le point d'accès, exécutez dans le même dossier :
+  ```bash
+  sudo netStop.sh
+  ```
 
-```sudo netStop.sh```
+## À venir
+
+- Ajout du lien vers le dépôt frontend
+- Documentation détaillée sur l'installation et l'utilisation
+
+---
+N'hésitez pas à proposer des améliorations ou à signaler des problèmes via les
