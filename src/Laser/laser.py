@@ -22,16 +22,14 @@ def cleanup():
     """Nettoie les paramètres GPIO."""
     GPIO.cleanup()
 
-def wait(seconds):
-    """Attend pendant un nombre de secondes spécifié."""
-    time.sleep(seconds)
 
+# tests
 if __name__ == "__main__":
     setup()
     try:
         turn_on_laser()
         print("Laser allumé pendant 5 secondes.")
-        wait(5)
+        time.sleep(5)
         turn_off_laser()
         print("Laser éteint.")
     finally:

@@ -1,5 +1,7 @@
 from TfLunaI2C import TfLunaI2C
 import time
+
+
 if __name__ == '__main__':
     # Basic Usage:
     tf = TfLunaI2C()
@@ -16,3 +18,4 @@ if __name__ == '__main__':
         data = tf.read_data()
         tf.print_data()
         time.sleep(0.5)
+        
