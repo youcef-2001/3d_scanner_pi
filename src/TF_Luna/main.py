@@ -5,9 +5,9 @@ import time
 if __name__ == '__main__':
     # Basic Usage:
     tfluna = TfLunaI2C()
-    tfLuna.set_mode_continuous()
-    tfLuna.save()
-    tfLuna.reboot()
+    tfluna.set_mode_continuous()
+    tfluna.save()
+    tfluna.reboot()
     #print(tf)
     #while True :
     #    data = tf.read_data()
