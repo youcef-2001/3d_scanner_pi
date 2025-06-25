@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 from datetime import datetime
 import socket
 import getpass
-from TfLunaI2C import TfLunaI2C
+#from TfLunaI2C import TfLunaI2C
 import time
 from laser import laser
 # Récupérer le nom d'hôte (hostname)
@@ -19,9 +19,9 @@ if __name__ == "__main__":
     try:
         setup()
         # Basic Usage:
-        tf = TfLunaI2C()
-        tf.us = False
-        print(tf)
+        #tf = TfLunaI2C()
+        #tf.us = False
+        #print(tf)
         
         #data = tf.read_data()
         #tf.print_data()
@@ -29,8 +29,8 @@ if __name__ == "__main__":
         save_dir = os.path.join(f"/home/{username}/images", timestamp)
         print(f"📂 Dossier de sauvegarde : {save_dir}")
         # fichier csv pour les donnees du capteur de distance
-        csv_file = os.path.join(save_dir, "distance_data.csv")
-        print(f"📊 Fichier CSV pour les données de distance : {csv_file}")
+        #csv_file = os.path.join(save_dir, "distance_data.csv")
+        #print(f"📊 Fichier CSV pour les données de distance : {csv_file}")
         os.makedirs(save_dir, exist_ok=True)
         picam2 = Picamera2()
         config = picam2.create_still_configuration(
@@ -60,10 +60,10 @@ if __name__ == "__main__":
             picam2.capture_file(filename)
             # capture egalement les donnees du capteur de distance
 
-            distance,amplitude,temperature,ticks,error = tf.read_data()
+            #distance,amplitude,temperature,ticks,error = tf.read_data()
             with open(csv_file, "a") as f:
                 f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
-            print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
+            #print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
             i += 1
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         if 'picam2' in locals():
             picam2.stop()
 
-        if 'tf' in locals():
-            tf.cleanup()
+        #if 'tf' in locals():
+        #    tf.cleanup()
         cleanup()
         print("✅ GPIO nettoyé. Caméra arrêtée.")
