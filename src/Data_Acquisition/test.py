@@ -6,7 +6,27 @@ import socket
 import getpass
 #from TfLunaI2C import TfLunaI2C
 import time
-from laser import laser
+
+# Configuration
+LASER_PIN = 37  # Broche physique (BOARD numbering) => GPIO26
+
+def setup():
+    """Initialise les paramètres GPIO."""
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(LASER_PIN, GPIO.OUT)
+    GPIO.output(LASER_PIN, GPIO.LOW)  # Éteint le laser par défaut
+
+def turn_on_laser():
+    """Allume le laser."""
+    GPIO.output(LASER_PIN, GPIO.HIGH)
+
+def turn_off_laser():
+    """Éteint le laser."""
+    GPIO.output(LASER_PIN, GPIO.LOW)
+
+def cleanup():
+    """Nettoie les paramètres GPIO."""
+    GPIO.cleanup()
 # Récupérer le nom d'hôte (hostname)
 #hostname = socket.gethostname()
 #print(f"Nom d'hôte de la machine : {hostname}")
