@@ -1,11 +1,12 @@
 from picamera2 import Picamera2
 import os
 import RPi.GPIO as GPIO
-import time
 from datetime import datetime
 import socket
 import getpass
-
+from TfLunaI2C import TfLunaI2C
+import time
+from laser import laser
 # Récupérer le nom d'hôte (hostname)
 #hostname = socket.gethostname()
 #print(f"Nom d'hôte de la machine : {hostname}")
@@ -13,28 +14,23 @@ import getpass
 # Récupérer le nom de l'utilisateur courant
 username = getpass.getuser()
 
-# Configuration des broches physiques (BOARD)
-LASER_PIN = 37  # GPIO26
-
-def setup():
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(LASER_PIN, GPIO.OUT)
-    GPIO.output(LASER_PIN, GPIO.LOW)
-
-def turn_on_laser():
-    GPIO.output(LASER_PIN, GPIO.HIGH)
-
-def turn_off_laser():
-    GPIO.output(LASER_PIN, GPIO.LOW)
-
-def cleanup():
-    GPIO.cleanup()
 
 if __name__ == "__main__":
     try:
         setup()
+        # Basic Usage:
+        tf = TfLunaI2C()
+        tf.us = False
+        print(tf)
+        
+        #data = tf.read_data()
+        #tf.print_data()
         timestamp = datetime.now().strftime("acquisition_%d_%m_%H_%M")
         save_dir = os.path.join(f"/home/{username}/images", timestamp)
+        print(f"📂 Dossier de sauvegarde : {save_dir}")
+        # fichier csv pour les donnees du capteur de distance
+        csv_file = os.path.join(save_dir, "distance_data.csv")
+        print(f"📊 Fichier CSV pour les données de distance : {csv_file}")
         os.makedirs(save_dir, exist_ok=True)
         picam2 = Picamera2()
         config = picam2.create_still_configuration(
@@ -58,10 +54,16 @@ if __name__ == "__main__":
         print("🔴 Laser allumé !")
 
         while (time.time() - temps_Deb) < 60:
-            filename = os.path.join(save_dir, f"img_{i:04d}.jpeg")
-            picam2.options["quality"] = 100
+            filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
+            picam2.options["quality"] = 99
+            # Capture d'image avec la caméra
             picam2.capture_file(filename)
-            print(f"📸 Image capturée : {filename}")
+            # capture egalement les donnees du capteur de distance
+
+            distance,amplitude,temperature,ticks,error = tf.read_data()
+            with open(csv_file, "a") as f:
+                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
+            print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
             i += 1
@@ -72,8 +74,13 @@ if __name__ == "__main__":
 
     finally:
         turn_off_laser()
+
         print("💡 Laser éteint.")
+
         if 'picam2' in locals():
             picam2.stop()
+
+        if 'tf' in locals():
+            tf.cleanup()
         cleanup()
         print("✅ GPIO nettoyé. Caméra arrêtée.")
