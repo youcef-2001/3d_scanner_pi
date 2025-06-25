@@ -81,8 +81,8 @@ if __name__ == "__main__":
             # capture egalement les donnees du capteur de distance
 
             #distance,amplitude,temperature,ticks,error = tf.read_data()
-            with open(csv_file, "a") as f:
-                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
+            #with open(csv_file, "a") as f:
+             #   f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
             #print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
