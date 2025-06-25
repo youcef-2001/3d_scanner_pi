@@ -19,7 +19,7 @@ Une base de données Supabase est utilisée pour stocker les utilisateurs et les
 
 Le Raspberry Pi agit à la fois comme point d'accès (AP) et client Wi-Fi.
 
-- Pour lancer le point d'accès, exécutez depuis le dossier `/home/pi/network-setup/log` :
+- Pour lancer le point d'accès, exécutez depuis le dossier `/network-setup/log` :
   ```bash
   sudo netStart
   ```
