@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, Response, send_file, request
 import RPi.GPIO as GPIO
-from picamera2 import Picamera2
+#from picamera2 import Picamera2
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -26,9 +26,9 @@ GPIO.setup(LASER_PIN, GPIO.OUT)
 GPIO.output(LASER_PIN, GPIO.LOW)
 
 # Initialisation des périphériques
-picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (1080, 720)}))
-picam2.start()
+#picam2 = Picamera2()
+#picam2.configure(picam2.create_video_configuration(main={"size": (1080, 720)}))
+#picam2.start()
 
 tf_luna = TfLunaI2C()
 tf_luna.us = False
@@ -111,12 +111,12 @@ def laser_setup():
 # ======================
 
 def generate_frames():
-    while True:
-        frame = picam2.capture_array("main")
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    #while True:
+     #   frame = picam2.capture_array("main")
+      #  ret, buffer = cv2.imencode('.jpg', frame)
+       # frame = buffer.tobytes()
+       # yield (b'--frame\r\n'
+       #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/camera/video_feed')
 def video_feed():
@@ -128,9 +128,9 @@ def capture_photo():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"photo_{timestamp}.jpg"
     
-    picam2.options["quality"] = 99
+    #picam2.options["quality"] = 99
     image_data = io.BytesIO()
-    picam2.capture_file(image_data, format='jpeg')
+    #picam2.capture_file(image_data, format='jpeg')
     image_data.seek(0)
     
     return send_file(image_data, mimetype='image/jpeg', 
@@ -189,23 +189,6 @@ def start_scan():
         
         # Fichier CSV pour les données
         csv_file = os.path.join(save_dir, "distance_data.csv")
-        
-        # Configuration caméra
-        config = picam2.create_still_configuration(
-            main={"size": (2592, 1944)},
-            controls={
-                "ExposureTime": 5000,
-                "AnalogueGain": 0.5,
-                "NoiseReductionMode": 1,
-                "Sharpness": 1.7,
-                "Contrast": 1.1,
-                "Saturation": 1.2,
-                "AwbMode": 1,
-                "AeExposureMode": "Short",
-                "MeteringMode": 1
-            }
-        )
-        
         # Démarrage du scan
         GPIO.output(LASER_PIN, GPIO.HIGH)
         start_time = time.time()
@@ -213,8 +196,8 @@ def start_scan():
         
         while (time.time() - start_time) < 60:  # 60 secondes
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            picam2.options["quality"] = 99
-            picam2.capture_file(filename)
+            #picam2.options["quality"] = 99
+            #picam2.capture_file(filename)
             
             distance, amplitude, temp, ticks, error = tf_luna.read_data()
             with open(csv_file, "a") as f:
@@ -250,7 +233,7 @@ def start_scan():
 @app.teardown_appcontext
 def cleanup(exception=None):
     GPIO.output(LASER_PIN, GPIO.LOW)
-    picam2.stop()
+    #picam2.stop()
     GPIO.cleanup()
 
 if __name__ == '__main__':

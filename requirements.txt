@@ -1,29 +1,19 @@
 
-#laser
+#laser et PIN
 RPi.GPIO
-
-
-
 #camera
 picamera2
 opencv-python
-
-
-# server stream
-
-cv2
-
+libcamera
 # server backend 
-
 flask
+#tf luna dep
 smbus
 pylint
-i2c-tools 
-libi2c0 
+# not pip  cv2     i2c-tools   libcamera-apps  libcamera-dev
+# not pip   libi2c0    libcap-dev
 #python3-smbus 
-read-edid
+#read-edid
 # activer le i2c
-
-
 #base de donne supabase 
 supabase
