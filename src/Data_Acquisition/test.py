@@ -28,10 +28,10 @@ if __name__ == "__main__":
         print(f"📂 Dossier de sauvegarde : {save_dir}")
         # fichier csv pour les donnees du capteur de distance
         csv_file = os.path.join(save_dir, "distance_data.csv")
-        with open(csv_file, "a") as f:
-                f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         print(f"📊 Fichier CSV pour les données de distance : {csv_file}")
         os.makedirs(save_dir, exist_ok=True)
+        with open(csv_file, "a") as f:
+                f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         picam2 = Picamera2()
         config = picam2.create_still_configuration(
         main={"size": (2592, 1944)},  # 5MP
