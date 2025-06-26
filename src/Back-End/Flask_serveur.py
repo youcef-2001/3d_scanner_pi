@@ -117,7 +117,7 @@ def generate_frames():
        # frame = buffer.tobytes()
        # yield (b'--frame\r\n'
        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
+    continue
 @app.route('/camera/video_feed')
 def video_feed():
     return Response(generate_frames(),
