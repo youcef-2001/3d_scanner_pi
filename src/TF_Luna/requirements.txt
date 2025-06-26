@@ -1,7 +1,0 @@
-smbus
-pylint
-i2c-tools 
-libi2c0 
-#python3-smbus 
-read-edid
-# activer le i2c
