@@ -5,8 +5,8 @@ import open3d as o3d
 from scipy.ndimage import gaussian_filter1d
 
 # === CONFIGURATION ===
-IMAGE_DIR = r"C:\Users\User\Desktop\Projet\reconstruction3D\acquisition_19_06_23_24"
-MODE = "libre"  # "rotation" ou "libre"
+IMAGE_DIR = r"C:\Users\User\imagesTmp\acquisition_25_06_15_11"
+MODE = "rotation"  # "rotation" ou "libre"
 PIXEL_SIZE_MM = 0.2
 IMAGE_WIDTH, IMAGE_HEIGHT = 640, 480
 CX, CY = IMAGE_WIDTH // 2, IMAGE_HEIGHT // 2
