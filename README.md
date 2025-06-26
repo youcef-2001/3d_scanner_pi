@@ -33,7 +33,7 @@ Le Raspberry Pi agit à la fois comme point d'accès (AP) et client Wi-Fi.
 
 - Ajout du lien vers le dépôt frontend
 - Documentation détaillée sur l'installation et l'utilisation
-- arborescence
+- arborescence:
 src/
 ├── Back-End/
 │   ├── __init__.py
