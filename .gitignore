@@ -1,3 +1,3 @@
 *.ply
 *.stl
-./src/Back-End/__pycache__
+src/Back-End/__pycache__
