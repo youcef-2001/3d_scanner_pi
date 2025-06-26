@@ -23,3 +23,7 @@ libi2c0
 #python3-smbus 
 read-edid
 # activer le i2c
+
+
+#base de donne supabase 
+supabase
