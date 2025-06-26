@@ -12,3 +12,7 @@ opencv-python
 # server stream
 
 cv2
+
+# server backend 
+
+flask
