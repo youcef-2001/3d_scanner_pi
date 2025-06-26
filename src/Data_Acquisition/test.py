@@ -80,7 +80,5 @@ if __name__ == "__main__":
         if 'picam2' in locals():
             picam2.stop()
 
-        if 'tf' in locals():
-            tf.cleanup()
         cleanup()
         print("✅ GPIO nettoyé. Caméra arrêtée.")
