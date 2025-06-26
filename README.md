@@ -33,7 +33,26 @@ Le Raspberry Pi agit à la fois comme point d'accès (AP) et client Wi-Fi.
 
 - Ajout du lien vers le dépôt frontend
 - Documentation détaillée sur l'installation et l'utilisation
-
+- arborescence:
+src/
+├── Back-End/
+│   ├── __init__.py
+│   ├── app.py                # Point d'entrée principal
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── camera_routes.py
+│   │   ├── laser_routes.py
+│   │   ├── lidar_routes.py
+│   │   └── scan_routes.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── camera_service.py
+│   │   ├── laser_service.py
+│   │   ├── lidar_service.py
+│   │   └── scan_service.py
+│   └── utils/
+│       ├── __init__.py
+│       └── gpio_manager.py
 ---
 N'hésitez pas à proposer des améliorations en nous contactons via nos addresses mails respectives :
 ``` ybaleh13@gmail.com|```
