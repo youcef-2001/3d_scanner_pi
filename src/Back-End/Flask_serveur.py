@@ -110,14 +110,15 @@ def laser_setup():
 # Routes Camera
 # ======================
 
-def generate_frames():
+#def generate_frames():
     #while True:
      #   frame = picam2.capture_array("main")
       #  ret, buffer = cv2.imencode('.jpg', frame)
        # frame = buffer.tobytes()
        # yield (b'--frame\r\n'
        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-    continue
+    
+
 @app.route('/camera/video_feed')
 def video_feed():
     return Response(generate_frames(),
