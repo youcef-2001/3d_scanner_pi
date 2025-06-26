@@ -1,21 +1,21 @@
 from picamera2 import Picamera2
-import RPi.GPIO as GPIO
 from datetime import datetime
-import socket
+import RPi.GPIO as GPIO
 import getpass
+import socket
+import time
 import sys
 import os
 # Ajoute le dossier racine du projet au path (celui qui contient Laser/)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from TF_Luna.TfLunaI2C import TfLunaI2C
+
 from Laser.laser import setup, turn_on_laser, turn_off_laser, cleanup
-import time
-
-# Récupérer le nom de l'utilisateur courant
-username = getpass.getuser()
+from TF_Luna.TfLunaI2C import TfLunaI2C
 
 
-if __name__ == "__main__":
+def Scan_with_CLL(duration = 10):
+    # Récupérer le nom de l'utilisateur courant
+    username = getpass.getuser()
     try:
         setup()
         # initialisation du capteur de distance
@@ -53,19 +53,19 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        while (time.time() - temps_Deb) < 10:
+        while (time.time() - temps_Deb) < duration:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            picam2.options["quality"] = 99
+            picam2.options["quality"] = 100
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
             # capture egalement les donnees du capteur de distance
-
             distance,amplitude,temperature,ticks,error = tf.read_data()
             with open(csv_file, "a") as f:
                 f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
             print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
+            #compteur de temps
             temps_totale = time.time() - temps_Deb
-            print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
+            #compteur d'images
             i += 1
         print("✅ Durée de capture atteinte.")
 
@@ -79,8 +79,5 @@ if __name__ == "__main__":
 
         if 'picam2' in locals():
             picam2.stop()
-
-        if 'tf' in locals():
-            tf.cleanup()
         cleanup()
         print("✅ GPIO nettoyé. Caméra arrêtée.")
