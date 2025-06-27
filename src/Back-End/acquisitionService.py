@@ -1,16 +1,15 @@
 from picamera2 import Picamera2
-from datetime import datetime
 import RPi.GPIO as GPIO
-import getpass
+from datetime import datetime
 import socket
-import time
+import getpass
 import sys
 import os
 # Ajoute le dossier racine du projet au path (celui qui contient Laser/)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 from TfLunaI2C import TfLunaI2C
+from laserService import setup, turn_on_laser, turn_off_laser, cleanup
+import time
 
 
 def Scan_with_CLL(duration = 10):
