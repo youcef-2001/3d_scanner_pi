@@ -3,7 +3,9 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20'
+image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_20'
+fichier_distances = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_30/distance_data.csv'
+
 image_files = sorted([
     os.path.join(image_folder, f)
     for f in os.listdir(image_folder)

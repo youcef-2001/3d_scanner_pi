@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20'
-fichier_distances = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20\distance_data.csv'
+image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_20'
+fichier_distances = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_20/distance_data.csv'
 image_files = sorted([
     os.path.join(image_folder, f)
     for f in os.listdir(image_folder)
@@ -49,7 +49,7 @@ def compute_3d_coordinates(distance, image):
     # Camera parameters
     img_h, img_w = image.shape[:2]
     cx, cy = img_w / 2, img_h / 2  # principal point at image center
-    focal_length_px = 2000  # Example value, adjust as needed
+    focal_length_px = 3.6  # Example value, adjust as needed
     
     points_3d = []
 
@@ -100,7 +100,9 @@ def create_simple_object(coordinates,output_file='simple_object.stl'):
             for point in coords:
                 f.write(f"  facet normal 0 0 0\n")
                 f.write(f"    outer loop\n")
-                f.write(f"      vertex {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
                 f.write(f"    endloop\n")
                 f.write(f"  endfacet\n")
         f.write("endsolid simple_object\n")
@@ -135,12 +137,12 @@ while i < len(image_files):
         i += 1
         continue
 
-    filtered = apply_filter(frame, 'HSV',118,0,153,219,236,255)#option peux etre rajouter 
+    filtered = apply_filter(frame, 'HSV',99,0,75,165,185,255)#option peux etre rajouter 
 
 
     # Chaque image est associée à une distance et l'objet tourne devant la caméra à une vitesse de 360 degrés par minute.
     # La caméra prend 15 images par seconde, donc chaque image correspond à un angle de rotation.
-    angle_per_image = 280 / len(image_files)  # 360° en 15s à 15 fps
+    angle_per_image = 300 / len(image_files)  # 300 degrees en 10 secondes 
     current_angle_deg = (i * angle_per_image) % 360
     current_angle_rad = np.deg2rad(current_angle_deg)
 
