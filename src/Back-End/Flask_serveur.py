@@ -124,6 +124,30 @@ def start_acquisition():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/annuler-acquisition', methods=['POST'])
+def annuler_acquisition():
+    try:
+        # Arrêter les processus d'acquisition (ex: testAcquisition.py)
+        result = subprocess.run(['pkill', '-f', 'testAcquisition.py'], capture_output=True, text=True)
+
+        if result.returncode == 0:
+            return jsonify({
+                "status": "success",
+                "message": "Acquisition annulée avec succès"
+            })
+        else:
+            # Même si aucun processus n'était en cours, on considère ça comme succès
+            return jsonify({
+                "status": "success",
+                "message": "Aucun processus actif à annuler"
+            })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
 
 if __name__ == '__main__':
     try:
