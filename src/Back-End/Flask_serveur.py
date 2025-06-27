@@ -111,9 +111,8 @@ if __name__ == '__main__':
 def start_acquisition():
     try:
         acquisition_path = os.path.join(os.path.dirname(__file__), 'testAcquisition.py')
-        print(f"📂 Chemin du script d'acquisition : {acquisition_path}")
-        result = subprocess.run(['python', acquisition_path], capture_output=True, text=True)
-        
+        result = subprocess.run(['python3', acquisition_path], capture_output=True, text=True)
+
         if result.returncode != 0:
             return jsonify({
                 "status": "error",
