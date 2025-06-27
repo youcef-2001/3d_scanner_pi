@@ -130,28 +130,3 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=5000, threaded=True)
     finally:
         print("Server stopped.")
-
-#start_acquisition
-
-import subprocess
-
-@app.route('/start-acquisition', methods=['POST'])
-def start_acquisition():
-    try:
-        acquisition_path = os.path.join(os.path.dirname(__file__), 'testAcquisition.py')
-        result = subprocess.run(['python', acquisition_path], capture_output=True, text=True)
-
-        if result.returncode != 0:
-            return jsonify({
-                "status": "error",
-                "message": result.stderr
-            }), 500
-
-        return jsonify({
-            "status": "success",
-            "message": "Acquisition lancée avec succès",
-            "stdout": result.stdout
-        })
-
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
