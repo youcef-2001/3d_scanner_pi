@@ -107,6 +107,8 @@ if __name__ == '__main__':
 
 #start_acquisition
 
+import subprocess
+
 @app.route('/start-acquisition', methods=['POST'])
 def start_acquisition():
     try:
