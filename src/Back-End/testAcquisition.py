@@ -53,7 +53,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        while (time.time() - temps_Deb) < 10:
+        while (time.time() - temps_Deb) < 30:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             picam2.options["quality"] = 99
             # Capture d'image avec la caméra
