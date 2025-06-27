@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/jeudi/acquisition_26_06_12_46'
+image_folder = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20'
 image_files = sorted([
     os.path.join(image_folder, f)
     for f in os.listdir(image_folder)

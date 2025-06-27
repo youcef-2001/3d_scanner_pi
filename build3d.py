@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/jeudi/acquisition_26_06_12_39'
-fichier_distances = '/Users/youcefbaleh/Desktop/IoT/tmp/images/jeudi/acquisition_26_06_12_39/distance_data.csv'
+image_folder = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20'
+fichier_distances = r'C:\Users\User\imagesTmp\acquisition_27_06_03_20\distance_data.csv'
 image_files = sorted([
     os.path.join(image_folder, f)
     for f in os.listdir(image_folder)
@@ -12,7 +12,7 @@ image_files = sorted([
 ])
 
 fps = 25
-mode = 'RGB'
+
 
 def nothing(x):
     pass
@@ -59,7 +59,7 @@ def compute_3d_coordinates(distance, image):
         y_norm = (v - cy) / focal_length_px
 
         # Assume Z = distance (from sensor), X = x_norm * Z, Y = y_norm * Z
-        Z = 5 # Convert cm to meters for 3D coordinates minus 2 percent for better accuracy
+        Z =distance# Convert cm to meters for 3D coordinates minus 2 percent for better accuracy
         X = x_norm * Z
         Y = y_norm * Z
 
@@ -125,7 +125,7 @@ with open(fichier_distances, 'r') as f:
                 continue  # Ignore lines with invalid data
 
 all_coordinates = []
-while i < 220:
+while i < len(image_files):
     image_path = image_files[i % len(image_files)]
     frame = cv2.imread(image_path)
     #rotate 180 degrees
@@ -135,12 +135,12 @@ while i < 220:
         i += 1
         continue
 
-    filtered = apply_filter(frame, 'RGB',101,9,0,242,54,255)#option peux etre rajouter 
+    filtered = apply_filter(frame, 'HSV',118,0,153,219,236,255)#option peux etre rajouter 
 
 
     # Chaque image est associée à une distance et l'objet tourne devant la caméra à une vitesse de 360 degrés par minute.
     # La caméra prend 15 images par seconde, donc chaque image correspond à un angle de rotation.
-    angle_per_image = 360 / 220  # 360° en 15s à 15 fps
+    angle_per_image = 280 / len(image_files)  # 360° en 15s à 15 fps
     current_angle_deg = (i * angle_per_image) % 360
     current_angle_rad = np.deg2rad(current_angle_deg)
 
