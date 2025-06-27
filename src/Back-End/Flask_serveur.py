@@ -1,3 +1,4 @@
+from threading import Thread
 from flask import Flask, jsonify, Response, send_file, request
 #import RPi.GPIO as GPIO
 #from picamera2 import Picamera2
@@ -10,6 +11,7 @@ import time
 import io
 import jwt
 import subprocess
+from testAcquisition import Scan_3D, Stop_Scan 
 
 #from datetime import datetime
 from supabase import create_client, Client
@@ -105,49 +107,32 @@ import subprocess
 
 @app.route('/start-acquisition', methods=['POST'])
 def start_acquisition():
-    try:
-        acquisition_path = os.path.join(os.path.dirname(__file__), 'testAcquisition.py')
-        result = subprocess.run(['python', acquisition_path], capture_output=True, text=True)
-
-        if result.returncode != 0:
+        try :
+            Thread(target=Scan_3D).start()
+            return jsonify({
+                "status": "success",
+                "message": "Acquisition démarrée"
+            })
+        except Exception as e:
             return jsonify({
                 "status": "error",
-                "message": result.stderr
+                "message": str(e)
             }), 500
-
-        return jsonify({
-            "status": "success",
-            "message": "Acquisition lancée avec succès",
-            "stdout": result.stdout
-        })
-
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        
 
 @app.route('/annuler-acquisition', methods=['POST'])
 def annuler_acquisition():
     try:
-        # Arrêter les processus d'acquisition (ex: testAcquisition.py)
-        result = subprocess.run(['pkill', '-f', 'testAcquisition.py'], capture_output=True, text=True)
-
-        if result.returncode == 0:
-            return jsonify({
-                "status": "success",
-                "message": "Acquisition annulée avec succès"
-            })
-        else:
-            # Même si aucun processus n'était en cours, on considère ça comme succès
-            return jsonify({
-                "status": "success",
-                "message": "Aucun processus actif à annuler"
-            })
-
+        Thread(target=Stop_Scan).start()
+        return jsonify({
+            "status": "success",
+            "message": "Acquisition annulée"
+        })
     except Exception as e:
         return jsonify({
             "status": "error",
             "message": str(e)
         }), 500
-
 
 if __name__ == '__main__':
     try:

@@ -14,10 +14,16 @@ import time
 # Récupérer le nom de l'utilisateur courant
 username = getpass.getuser()
 
+isScanning = True
+def Stop_Scan():
+    global isScanning
+    isScanning = False
 
-if __name__ == "__main__":
+def Scan_3D():
+    global isScanning
     try:
         setup()
+        
         # initialisation du capteur de distance
         tf = TfLunaI2C()
         tf.us = False
@@ -53,7 +59,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        while (time.time() - temps_Deb) < 30:
+        while isScanning:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             picam2.options["quality"] = 99
             # Capture d'image avec la caméra
@@ -82,3 +88,9 @@ if __name__ == "__main__":
 
         cleanup()
         print("✅ GPIO nettoyé. Caméra arrêtée.")
+
+
+if __name__ == "__main__":
+    print("🔍 Démarrage de la numérisation 3D...")
+    Scan_3D()
+    print("✅ Numérisation terminée.")
