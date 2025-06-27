@@ -7,7 +7,7 @@ import sys
 import os
 # Ajoute le dossier racine du projet au path (celui qui contient Laser/)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from TF_Luna.TfLunaI2C import TfLunaI2C
+from TfLunaI2C import TfLunaI2C
 from Laser.laser import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 
