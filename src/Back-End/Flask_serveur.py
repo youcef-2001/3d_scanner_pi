@@ -8,6 +8,7 @@ from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 import io
+import jwt
 
 #from datetime import datetime
 from supabase import create_client, Client
@@ -34,27 +35,30 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/appairer', methods=['POST'])
 def appairer():
-    
-    """Authentifie un utilisateur avec Supabase"""
-    data = request.get_json()
     try:
-        response = supabase.auth.sign_in_with_password({
-            "email": data['email'],
-            "user_id": data['user_id'],
-            "isDeviceConnected": data['isDeviceConnected'],
-        })
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Token JWT manquant"}), 401
+
+        token = auth_header.split(" ")[1]
+
+        # Décodage du JWT sans vérification de signature (juste pour extraction)
+        payload = jwt.decode(token, options={"verify_signature": False})
+        user_email = payload.get("email")
+        user_id = payload.get("sub")
+
+        print(f"[Appairage] Utilisateur : {user_email}, ID: {user_id}")
+
         return jsonify({
             "status": "success",
-            "user": response.user.dict(),
-            "session": response.session.dict()
+            "message": "Appairage réussi",
+            "user_id": user_id,
+            "email": user_email,
+            "laser": "off"  # si tu veux renvoyer un état de laser par défaut
         })
+
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 401
-if __name__ == '__main__':
-    try:
-        app.run(host='0.0.0.0', port=5000, threaded=True)
-    finally:
-        print("Server stopped.")
+        return jsonify({"error": str(e)}), 400
         
         
 # Allumer le laser
