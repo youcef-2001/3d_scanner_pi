@@ -113,7 +113,7 @@ import subprocess
 def start_acquisition():
     try:
         acquisition_path = os.path.join(os.path.dirname(__file__), 'testAcquisition.py')
-        result = subprocess.run(['python3', acquisition_path], capture_output=True, text=True)
+        result = subprocess.run(['python', acquisition_path], capture_output=True, text=True)
 
         if result.returncode != 0:
             return jsonify({
