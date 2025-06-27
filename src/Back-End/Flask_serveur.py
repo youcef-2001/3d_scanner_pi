@@ -5,7 +5,6 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from TfLunaI2C import TfLunaI2C
-from acquisitionService import Scan_with_CLL
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 import io
@@ -58,16 +57,6 @@ if __name__ == '__main__':
         print("Server stopped.")
         
         
-# Lancer un scan (images + données)
-@app.route('/scan', methods=['POST'])
-def launch_scan():
-    duration = request.json.get('duration', 10)  # durée en secondes, défaut 10
-    try:
-        Scan_with_CLL(duration)
-        return jsonify({"status": "success", "message": f"Scan terminé ({duration}s)"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
 # Allumer le laser
 @app.route('/laser/on', methods=['POST'])
 def laser_on():
