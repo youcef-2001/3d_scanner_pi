@@ -4,16 +4,15 @@ RPi.GPIO
 #camera
 picamera2
 opencv-python
+opencv
 libcamera
 # server backend 
 flask
 #tf luna dep
 smbus
 pylint
-# not pip  cv2     i2c-tools   libcamera-apps  libcamera-dev
-# not pip   libi2c0    libcap-dev
 #python3-smbus 
 #read-edid
-# activer le i2c
+
 #base de donne supabase 
 supabase

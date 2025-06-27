@@ -7,8 +7,8 @@ import sys
 import os
 # Ajoute le dossier racine du projet au path (celui qui contient Laser/)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from TF_Luna.TfLunaI2C import TfLunaI2C
-from Laser.laser import setup, turn_on_laser, turn_off_laser, cleanup
+from TfLunaI2C import TfLunaI2C
+from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 
 # Récupérer le nom de l'utilisateur courant
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        while (time.time() - temps_Deb) < 10:
+        while (time.time() - temps_Deb) < 30:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             picam2.options["quality"] = 99
             # Capture d'image avec la caméra

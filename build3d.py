@@ -49,7 +49,7 @@ def compute_3d_coordinates(distance, image):
     # Camera parameters
     img_h, img_w = image.shape[:2]
     cx, cy = img_w / 2, img_h / 2  # principal point at image center
-    focal_length_px = 2  # Example value, adjust as needed
+    focal_length_px = 2000  # Example value, adjust as needed
     
     points_3d = []
 
@@ -59,7 +59,7 @@ def compute_3d_coordinates(distance, image):
         y_norm = (v - cy) / focal_length_px
 
         # Assume Z = distance (from sensor), X = x_norm * Z, Y = y_norm * Z
-        Z =distance *10 # Convert  to mm
+        Z =distance# Convert cm to meters for 3D coordinates minus 2 percent for better accuracy
         X = x_norm * Z
         Y = y_norm * Z
 
