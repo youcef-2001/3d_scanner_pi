@@ -3,8 +3,7 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_20'
-fichier_distances = '/Users/youcefbaleh/Desktop/IoT/tmp/images/images/acquisition_27_06_03_30/distance_data.csv'
+image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/acquisition_19_06_23_31'
 
 image_files = sorted([
     os.path.join(image_folder, f)
@@ -12,7 +11,7 @@ image_files = sorted([
     if f.lower().endswith(('.jpg', '.png', '.jpeg', '.bmp'))
 ])
 
-fps = 25
+fps = 30  # Frames per second for the video playback
 mode = 'HSV'
 
 def nothing(x):

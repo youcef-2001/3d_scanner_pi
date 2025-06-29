@@ -98,11 +98,11 @@ def create_simple_object(coordinates,output_file='simple_object.stl'):
         f.write("solid simple_object\n")
         for coords in coordinates:
             for point in coords:
-                f.write(f"  facet normal 0 0 0\n")
+                f.write(f"  facet normal 1,1,1\n")
                 f.write(f"    outer loop\n")
-                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
-                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
-                f.write(f"      point {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      vertex {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      vertex {point[0]} {point[1]} {point[2]}\n")
+                f.write(f"      vertex {point[0]} {point[1]} {point[2]}\n")
                 f.write(f"    endloop\n")
                 f.write(f"  endfacet\n")
         f.write("endsolid simple_object\n")
