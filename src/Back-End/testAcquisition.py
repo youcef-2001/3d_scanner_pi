@@ -55,6 +55,8 @@ if __name__ == "__main__":
 
         while (time.time() - temps_Deb) < 30:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
+            #srtup fov to 3.5
+            picam2.options["fov"] = 3.5
             picam2.options["quality"] = 99
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
