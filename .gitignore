@@ -1,5 +1,5 @@
-./*.ply
-*.stl
+point_cloud.ply
+simple_object.stl
 src/Back-End/__pycache__
 bin
 include
