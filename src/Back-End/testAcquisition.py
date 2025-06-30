@@ -42,7 +42,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        for i in range(1000):
+        for i in range(100):
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             #srtup fov to 3.6
             picam2.options["fov"] = 3.6
