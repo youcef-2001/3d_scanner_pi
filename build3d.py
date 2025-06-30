@@ -18,9 +18,11 @@ if __name__ == "__main__":
     i = 0
     coords_per_image = []
     repere_translations = []# images - 1
-    previous_image_path = None
-    while  i < 400:
+    origin_image_path = None
+    while  i < 200:
         image_path = image_files[i ]
+        if i == 0:
+            origin_image_path = image_path
         frame = cv2.imread(image_path)
         if frame is None:
             print(f"❌ Impossible de lire l'image {image_path}.")
@@ -49,15 +51,15 @@ if __name__ == "__main__":
                         x_cartesian, y_cartesian, z_cartesian = spherical_to_cartesian(distance, longitude, latitude)
                         coords_per_pixel.append((x_cartesian, y_cartesian, z_cartesian))
             coords_per_image.append(coords_per_pixel)
-            if previous_image_path is not None:
-                R, t = repere_translation(previous_image_path, image_path)
+            if origin_image_path is not None:
+                R, t = repere_translation(origin_image_path, image_path)
                 if repere_translations.__len__() != 0:
                     last_R = repere_translations[-1][0]
                     last_t = repere_translations[-1][1]
                     t = last_R @ t + last_t  # Translation relative to the previous image
                     R = last_R @ R  # Rotation relative to the previous image    
                 repere_translations.append((R, t))
-            previous_image_path = image_path
+            
             i += 1
         
     #Rotation Totale , translation totale

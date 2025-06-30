@@ -102,7 +102,8 @@ def repere_translation(path_img1,path_img2):
 
     # === Étape 3 : Définir la matrice intrinsèque (à adapter à ta caméra) ===
     # Pour une caméra Raspberry Pi 5MP V1 typique (approximatif)
-    fx = fy = FOCALE / PIXEL_SIZE  # Focale en pixels
+    fx = 700
+    fy = 650
     cx, cy = img1.shape[1] / 2, img1.shape[0] / 2
 
     K = np.array([[fx, 0, cx],
