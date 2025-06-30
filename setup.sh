@@ -1,7 +1,6 @@
 #!bin/bash
 
 #ce script servira a setup notre raspberry automatiquement pour eviter de retaper les commandes de depart
-
 apt-get install -y git
 apt install -y hostapd dnsmasq netfilter-persistent iptables-persistent dhcpcd 
 
