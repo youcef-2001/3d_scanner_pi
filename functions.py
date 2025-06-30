@@ -5,15 +5,15 @@ import math
 
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/jeudi/acquisition_26_06_12_38'
-DISTANCE_CAMERA_LASER = 6.5# in cm 
-DEGREE_CAMERA_CENTER_LASER = 14 # in degree
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/acquisition_30_06_15_09'
+DISTANCE_CAMERA_LASER = 6.8# in cm 
+DEGREE_CAMERA_CENTER_LASER = 12 # in degree
 INITIAL_CAMERA_DEGREE = 90
-INITIAL_LASER_DEGREE = 76
+INITIAL_LASER_DEGREE = 78
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 42 # in degree, vertical field of view of the camera
-HSV_FILTRE= (163, 130, 80, 185, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (41, 42, 36, 209, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (149, 0, 228, 255, 155, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (211, 193, 205, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 3.6 # in mm, focal length of the camera
 PIXEL_SIZE=1.388e-6
 # === Appliquer le filtre 
@@ -61,9 +61,9 @@ def spherical_to_cartesian(r, long, latitude):
     long = np.deg2rad(long)  # Longitude
     latitude = np.deg2rad(latitude)      # Latitude
 
-    x = r * np.cos(long) * np.cos(latitude)
-    y = r * np.cos(long) * np.sin(latitude)
-    z = r * np.sin(long)
+    x = r * np.cos(latitude) * np.cos(long)
+    y = r * np.cos(latitude) * np.sin(long)
+    z = r * np.sin(latitude)
     return x, y, z
 
 
@@ -102,7 +102,7 @@ def repere_translation(path_img1,path_img2):
 
     # === Étape 3 : Définir la matrice intrinsèque (à adapter à ta caméra) ===
     # Pour une caméra Raspberry Pi 5MP V1 typique (approximatif)
-    fx = fy = 800  # focale en pixels (à adapter si calibré)
+    fx = fy = FOCALE / PIXEL_SIZE  # Focale en pixels
     cx, cy = img1.shape[1] / 2, img1.shape[0] / 2
 
     K = np.array([[fx, 0, cx],

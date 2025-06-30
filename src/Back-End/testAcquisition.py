@@ -53,10 +53,10 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
 
-        while (time.time() - temps_Deb) < 30:
+        for i in range(100):
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            #srtup fov to 3.5
-            picam2.options["fov"] = 3.5
+            #srtup fov to 3.6
+            picam2.options["fov"] = 3.6
             picam2.options["quality"] = 99
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
@@ -69,6 +69,8 @@ if __name__ == "__main__":
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
             i += 1
+            wait_time = 0.5
+            time.sleep(wait_time)
         print("✅ Durée de capture atteinte.")
 
     except KeyboardInterrupt:

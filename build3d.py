@@ -19,7 +19,7 @@ if __name__ == "__main__":
     coords_per_image = []
     repere_translations = []# images - 1
     previous_image_path = None
-    while  i < len(image_files):
+    while  i < 400:
         image_path = image_files[i ]
         frame = cv2.imread(image_path)
         if frame is None:
