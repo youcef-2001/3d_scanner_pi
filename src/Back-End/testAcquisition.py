@@ -42,8 +42,7 @@ if __name__ == "__main__":
         #1mp = (1280, 720)
         #ratio = 6/5
         #4 mp  with ratio 6/5 = 
-        config = picam2.create_still_configuration(main={"size": (1280, 1280)})
-        picam2.set_transform(mytransform)
+        config = picam2.create_still_configuration(main={"size": (1280, 1280)},transform = mytransform)
         picam2.start()
         time.sleep(1)
         i = 0
