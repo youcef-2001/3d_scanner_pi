@@ -34,7 +34,7 @@ if __name__ == "__main__":
                 f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         picam2 = Picamera2()
         config = picam2.create_still_configuration(
-        main={"size": (1920, 1080), "format": "RGB888"},transform=Picamera2.Transform(rotation=180))
+        main={"size": (1920, 1080), "format": "RGB888"},transform="rotate-180")
         picam2.start()
         time.sleep(1)
         i = 0
