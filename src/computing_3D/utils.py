@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import os
 import math
 """First test with paper  chessboard calibration
 Camera Matrix (Intrinsics):
@@ -26,12 +25,12 @@ DEGREE_CAMERA_CENTER_LASER = 12 # in degree
 INITIAL_CAMERA_DEGREE = 90
 INITIAL_LASER_DEGREE = 78
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
-VERTICAL_FOV = 42 # in degree, vertical field of view of the camera
+VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
 HSV_FILTRE= (0, 0, 255, 255, 229, 255) # (l1,l2,l3,h1,h2,h3)
 RGB_FILTRE = (169, 205, 205, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 3.6 # in mm, focal length of the camera
-PIXEL_SIZE=1.388e-6
-
+PIXEL_SIZE=1.4e-6
+DISTANCE_CAMERA_ROTATION_CENTER = 27.5 # in cm, distance between the camera and the rotation center of the platform
 
 # === Appliquer le filtre  HSV ou RGB ===
 def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
@@ -61,7 +60,7 @@ def compute_spherique_coords(px,py,width, height):
     Returns the distance between the camera and the object, the latitude, and the longitude of the object in the spherical coordinate system.
     """
     #calculer le degré de l'angle  Laser_Camera_Object
-    longitude =  (px - width/2 )* (HORIZONTAL_FOV / width) # Différence en pixels par rapport au centre de l'image
+    longitude =  (px - (width/2) )* (HORIZONTAL_FOV / width) # Différence en pixels par rapport au centre de l'image
     laser_cam_obj_deg = INITIAL_CAMERA_DEGREE + longitude  # en degré
     # calculer le degré de l'angle Laser_Object_Camera
     # calculer le degré de l'angle Laser_Object_Camera
@@ -71,7 +70,7 @@ def compute_spherique_coords(px,py,width, height):
     # calculer la distance entre la caméra et l'objet sur axe x
     d = ratio * math.sin(math.radians(INITIAL_LASER_DEGREE)) 
     # calculer la distance entre la caméra et l'objet sur axe y
-    delta_pixels = py - height / 2
+    delta_pixels = py - (height / 2)
     latitude = (delta_pixels * VERTICAL_FOV / height)  # Différence en pixels par rapport au centre de l'image
     delta_real = abs(delta_pixels * d * PIXEL_SIZE / FOCALE)
     distance = math.sqrt(d**2 + delta_real**2)  # Distance totale
@@ -102,38 +101,93 @@ def spherical_to_cartesian(r, long, latitude):
 
 
  # une platforme rotative tourne l'object de 360° en 15 secondes
-    # les image sont prise a une frequence de 15,5 par seconde 
-    # la duree de la capture est de 20 secondes
-    # donc il y a environ  310 images
-    # je dois trouver le nouveau repere de la camera et assembler tout mes points a un repere dont l'origine sera le centre de tout les points 
-    
-    
-def compute_origin_coords(coords_per_image):
+def get_rotation_center_coordinates():
     """
-    Computes the average coordinates of all points in the list of coordinates per image.
-    coords_per_image: List of lists of coordinates per image
-    Returns the average coordinates as a tuple (x, y, z).
+    Retourne les coordonnées du centre de rotation de la plateforme.
+    # La plateforme est supposée être sur le plan XY"""
+    return 0,0,0  # Le centre de rotation est à l'origine du système de coordonnées (0, 0, 0)
+
+
+def get_camera_coordinates(degree,init_x= 0, init_y=0, init_z=DISTANCE_CAMERA_ROTATION_CENTER):
     """
-    total_x = 0
-    total_y = 0
-    total_z = 0
-    count = 0
+    Retourne les coordonnées de la caméra.
+    """
+    # Rotation de la caméra autour de l'axe Y hauteur
+    angle_rad = math.radians(degree)
+    x = init_x * math.cos(angle_rad) + init_z * math.sin(angle_rad)
+    y = init_y
+    z = -init_x * math.sin(angle_rad) + init_z * math.cos(angle_rad)
 
-    for coords in coords_per_image:
-        for coord in coords:
-            total_x += coord[0]
-            total_y += coord[1]
-            total_z += coord[2]
-            count += 1
+    return x, y, z  # Retourne les coordonnées de la caméra dans le système de coordonnées du centre de rotation
 
-    if count == 0:
-        return (0, 0, 0)
+def  camerapoint_to_centerpoint(cam_coords, px, py, width, height):
+    """
+    Transforme les coordonnées de l'objet détecté par la caméra en coordonnées du centre de rotation.
+    degree : degré de la caméra
+    px : coordonnée x de l'objet dans l'image
+    py : coordonnée y de l'objet dans l'image
+    width : largeur de l'image
+    height : hauteur de l'image
+    Retourne les coordonnées (x, y, z) de l'objet dans le système de coordonnées du centre de rotation.
+    """
+    distance, latitude, longitude = compute_spherique_coords(px, py, width, height)
+    x, y, z = spherical_to_cartesian(distance, longitude, latitude)
+    
+    # pour transferer lescoords du la camera vers le centre de rotation
+    #etant donner qu'il ya pas de rotation de la camera
+    # la regle est   P' = P+C ou C est la camera  et 
+    # P' est le point dans le systeme de coordonnees du centre de rotation
+    x1, y1, z1 = cam_coords
+    x_center = x + x1
+    y_center = y + y1   
+    z_center = z - z1# car la camera est a l'opposée de la plateforme
+    
+    return x_center, y_center, z_center
 
-    return (total_x / count, total_y / count, total_z / count)
 
+#le K donner par default est issue d'une precedente calibration de la camera
+def estimate_camera_poses(image_paths, K=np.array([[305.83777934, 0, 316.16069303],
+                                                   [0, 304.78118715, 229.49325219],
+                                                   [0, 0, 1]])):
+    poses = [np.eye(4)]  # première pose = identité (origine)
+    
+    sift = cv2.SIFT_create()
+    FLANN_INDEX_KDTREE = 1
+    flann = cv2.FlannBasedMatcher(dict(algorithm=FLANN_INDEX_KDTREE, trees=5), dict(checks=50))
 
+    prev_img = cv2.imread(image_paths[0], cv2.IMREAD_GRAYSCALE)
+    kp1, des1 = sift.detectAndCompute(prev_img, None)
 
+    for idx in range(1, len(image_paths)):
+        curr_img = cv2.imread(image_paths[idx], cv2.IMREAD_GRAYSCALE)
+        kp2, des2 = sift.detectAndCompute(curr_img, None)
 
+        matches = flann.knnMatch(des1, des2, k=2)
+        good_matches = [m for m, n in matches if m.distance < 0.7 * n.distance]
+
+        pts1 = np.float32([kp1[m.queryIdx].pt for m in good_matches])
+        pts2 = np.float32([kp2[m.trainIdx].pt for m in good_matches])
+
+        # Matrice essentielle
+        E, mask = cv2.findEssentialMat(pts1, pts2, K, method=cv2.RANSAC, threshold=1.0)
+
+        # Rotation et translation relative
+        _, R, t, mask_pose = cv2.recoverPose(E, pts1, pts2, K)
+
+        # Construire la transformation homogène 4x4
+        T = np.eye(4)
+        T[:3, :3] = R
+        T[:3, 3] = t.flatten()
+
+        # Calculer la pose globale : pose_i = pose_{i-1} @ T
+        pose_i = poses[-1] @ T
+        poses.append(pose_i)
+
+        # Mettre à jour
+        kp1, des1 = kp2, des2
+        prev_img = curr_img
+
+    return poses  # Liste des matrices 4x4
 
 
     
