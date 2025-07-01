@@ -41,27 +41,24 @@ if __name__ == "__main__":
         temps_Deb = time.time()
         turn_on_laser()
         print("🔴 Laser allumé !")
-
-        for i in range(1000):
+        tfluna_acqu = []
+        while temps_Deb-time.time() < 5:  # Durée de capture de 60 secondes
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            #srtup fov to 3.6
-            picam2.options["fov"] = 3.6
-            picam2.options["quality"] = 99
-            # camera a l'envers 
-            picam2.options["transform"] = "rotate-180"
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
             # capture egalement les donnees du capteur de distance
-
             distance,amplitude,temperature,ticks,error = tf.read_data()
-            with open(csv_file, "a") as f:
-                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
+            tfluna_acqu.append((distance,amplitude,temperature,ticks,error))
             print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
             i += 1
         print("✅ Durée de capture atteinte.")
 
+        with open(csv_file, "a") as f:
+            for j, (distance, amplitude, temperature, ticks, error) in enumerate(tfluna_acqu):
+                # Écriture des données dans le fichier CSV
+                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
     except KeyboardInterrupt:
         print("🛑 Arrêt par l'utilisateur.")
 
