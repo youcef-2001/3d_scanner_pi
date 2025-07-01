@@ -2,18 +2,33 @@ import cv2
 import numpy as np
 import os
 import math
-
+"""First test with paper  chessboard calibration
+Camera Matrix (Intrinsics):
+[[283.52584547   0.         317.4817892 ]
+ [  0.         285.4622619  221.27073088]
+ [  0.           0.           1.        ]]
+Distortion Coefficients:
+ [[ 0.04365984 -0.01581748  0.00112492  0.00088643  0.00136511]]
+"""
+""" Second test with screen Macbook calibration
+Camera Matrix (Intrinsics):
+ [[305.83777934   0.         316.16069303]
+ [  0.         304.78118715 229.49325219]
+ [  0.           0.           1.        ]]
+Distortion Coefficients:
+ [[ 0.05471393 -0.36118367 -0.00134342 -0.00132277  0.72260052]]
+"""
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/acquisition_30_06_15_09'
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/images/acquisition_30_06_19_28'
 DISTANCE_CAMERA_LASER = 6.8# in cm 
 DEGREE_CAMERA_CENTER_LASER = 12 # in degree
 INITIAL_CAMERA_DEGREE = 90
 INITIAL_LASER_DEGREE = 78
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 42 # in degree, vertical field of view of the camera
-HSV_FILTRE= (149, 0, 228, 255, 155, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (211, 193, 205, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (0, 0, 204, 184, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (187, 124, 196, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 3.6 # in mm, focal length of the camera
 PIXEL_SIZE=1.388e-6
 # === Appliquer le filtre 
@@ -61,9 +76,9 @@ def spherical_to_cartesian(r, long, latitude):
     long = np.deg2rad(long)  # Longitude
     latitude = np.deg2rad(latitude)      # Latitude
 
-    x = r * np.cos(latitude) * np.cos(long)
-    y = r * np.cos(latitude) * np.sin(long)
-    z = r * np.sin(latitude)
+    x = r * np.cos(long) * np.cos(latitude)
+    y = r * np.cos(long) * np.sin(latitude)
+    z = r * np.sin(long)
     return x, y, z
 
 
@@ -102,9 +117,9 @@ def repere_translation(path_img1,path_img2):
 
     # === Étape 3 : Définir la matrice intrinsèque (à adapter à ta caméra) ===
     # Pour une caméra Raspberry Pi 5MP V1 typique (approximatif)
-    fx = 700
-    fy = 650
-    cx, cy = img1.shape[1] / 2, img1.shape[0] / 2
+    fx = 300
+    fy = 300
+    cx, cy = 315,225
 
     K = np.array([[fx, 0, cx],
                 [0, fy, cy],

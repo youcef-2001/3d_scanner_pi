@@ -3,10 +3,10 @@ import numpy as np
 import os
 
 # === Dossier des images ===
-image_folder = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/acquisition_30_06_15_09'
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/images/acquisition_30_06_19_28'
 image_files = sorted([
-    os.path.join(image_folder, f)
-    for f in os.listdir(image_folder)
+    os.path.join(IMAGE_FOLDER, f)
+    for f in os.listdir(IMAGE_FOLDER)
     if f.lower().endswith(('.jpg', '.png', '.jpeg', '.bmp'))
 ])
 

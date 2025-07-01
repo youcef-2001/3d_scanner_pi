@@ -3,7 +3,7 @@ import numpy as np
 import glob
 
 # Chessboard dimensions (number of inner corners)
-chessboard_size = (9, 6)
+chessboard_size = (7, 7)
 square_size = 1.0  # Set to actual size of a square (e.g., 25mm or 1.0 if using arbitrary units)
 
 # Prepare object points
@@ -16,7 +16,7 @@ objpoints = []  # 3D points in real world
 imgpoints = []  # 2D points in image
 
 # Load images
-images = glob.glob('/Users/youcefbaleh/Desktop/IoT/tmp/images/calib/images/acquisition_30_06_18_54/*.jpeg')
+images = glob.glob('/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/images/acquisition_30_06_18_54/*.jpeg')
 
 
 for fname in images:

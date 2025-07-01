@@ -19,7 +19,7 @@ if __name__ == "__main__":
     coords_per_image = []
     repere_translations = []# images - 1
     origin_image_path = None
-    while  i < 200:
+    while  i < 73:
         image_path = image_files[i ]
         if i == 0:
             origin_image_path = image_path
