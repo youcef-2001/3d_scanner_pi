@@ -1,5 +1,6 @@
 from picamera2 import Picamera2
 import RPi.GPIO as GPIO
+from picamera2.utils import Transform
 from datetime import datetime
 import socket
 import getpass
@@ -33,7 +34,8 @@ if __name__ == "__main__":
         with open(csv_file, "a") as f:
                 f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         picam2 = Picamera2()
-        config = picam2.create_still_configuration(main={"size": (1920, 1080)}, transform={"vflip": True, "hflip": True} )
+        mytransform = Transform(rotation=180)
+        config = picam2.create_still_configuration(main={"size": (1920, 1080)}, transform= mytransform)
         picam2.start()
         time.sleep(1)
         i = 0
@@ -41,7 +43,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
         tfluna_acqu = []
-        while time.time()-temps_Deb < 5:  # Durée de capture de 60 secondes
+        while time.time()-temps_Deb < 2:  # Durée de capture de 60 secondes
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
