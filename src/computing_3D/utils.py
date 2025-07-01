@@ -20,15 +20,15 @@ Distortion Coefficients:
 """
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/images/acquisition_30_06_19_28'
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/images/acquisition_01_07_11_07'
 DISTANCE_CAMERA_LASER = 6.8# in cm 
 DEGREE_CAMERA_CENTER_LASER = 12 # in degree
 INITIAL_CAMERA_DEGREE = 90
 INITIAL_LASER_DEGREE = 78
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 42 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 204, 184, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (187, 124, 196, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (0, 0, 255, 255, 229, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (169, 205, 205, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 3.6 # in mm, focal length of the camera
 PIXEL_SIZE=1.388e-6
 
@@ -100,6 +100,36 @@ def spherical_to_cartesian(r, long, latitude):
     return x, y, z
 
 
+
+ # une platforme rotative tourne l'object de 360° en 15 secondes
+    # les image sont prise a une frequence de 15,5 par seconde 
+    # la duree de la capture est de 20 secondes
+    # donc il y a environ  310 images
+    # je dois trouver le nouveau repere de la camera et assembler tout mes points a un repere dont l'origine sera le centre de tout les points 
+    
+    
+def compute_origin_coords(coords_per_image):
+    """
+    Computes the average coordinates of all points in the list of coordinates per image.
+    coords_per_image: List of lists of coordinates per image
+    Returns the average coordinates as a tuple (x, y, z).
+    """
+    total_x = 0
+    total_y = 0
+    total_z = 0
+    count = 0
+
+    for coords in coords_per_image:
+        for coord in coords:
+            total_x += coord[0]
+            total_y += coord[1]
+            total_z += coord[2]
+            count += 1
+
+    if count == 0:
+        return (0, 0, 0)
+
+    return (total_x / count, total_y / count, total_z / count)
 
 
 

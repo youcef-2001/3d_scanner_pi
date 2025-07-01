@@ -1,4 +1,4 @@
-from computing_3D.utils import *
+from utils import *
 
 
 
@@ -19,7 +19,14 @@ if __name__ == "__main__":
     coords_per_image = []
     repere_translations = []# images - 1
     origin_image_path = None
-    while  i < 73:
+    # une platforme rotative tourne l'object de 360° en 15 secondes
+    # les image sont prise a une frequence de 15,5 par seconde 
+    # la duree de la capture est de 20 secondes
+    # donc il y a environ  310 images
+    # je dois trouver le nouveau repere de la camera et assembler tout mes points a un repere dont l'origine sera le centre de tout les points 
+    
+    
+    while  i < len(image_files):
         image_path = image_files[i ]
         if i == 0:
             origin_image_path = image_path
@@ -43,41 +50,24 @@ if __name__ == "__main__":
         myzip = list(zip(xs, ys))  # Liste des coordonnées (x, y) des pixels non noirs
         if myzip.__len__ == 0:
             print(f"❌ Aucune coordonnée valide trouvée dans l'image {image_path}.")
-            i += 1
             continue
         else:    
             for x,y in myzip :
                         distance, latitude, longitude = compute_spherique_coords(x, y, width, height)
                         x_cartesian, y_cartesian, z_cartesian = spherical_to_cartesian(distance, longitude, latitude)
                         coords_per_pixel.append((x_cartesian, y_cartesian, z_cartesian))
+                        
             coords_per_image.append(coords_per_pixel)
-            if origin_image_path is not None:
-                R, t = repere_translation(origin_image_path, image_path)
-                if repere_translations.__len__() != 0:
-                    last_R = repere_translations[-1][0]
-                    last_t = repere_translations[-1][1]
-                    t = last_R @ t + last_t  # Translation relative to the previous image
-                    R = last_R @ R  # Rotation relative to the previous image    
-                repere_translations.append((R, t))
-            
-            i += 1
+            # transformer les points de chaque image a un origin commun
+        i += 1
         
     #Rotation Totale , translation totale
-    repere_translations = translate_to_one_repere(repere_translations)
-    #  transformer les coords de chaque repere (image) vers le repere 0 de la premiere image
-    coords_per_image_transformed = []
-    for img_num, coords in enumerate(coords_per_image):
-        if img_num != 0:
-            R, t = repere_translations[img_num-1]
-            coords_transformed = [transform_point_to_repere2(np.array(coord), R, t) for coord in coords]
-            coords_per_image_transformed.append(coords_transformed)
-            
-        else:
-            coords_per_image_transformed.append(coords)
+
+
             
     # cree un fichier stl pour lire avec blender
     stl_file_path = os.path.join('./', "3d_object.stl")
-    coords_list = [pt for img in coords_per_image_transformed for pt in img]
+    coords_list = [pt for img in coords_per_image for pt in img]
     # faire des triangles avec 3 points de 3 images consécutives
     with open(stl_file_path, 'w') as stl_file:
         # Écrire les triangles dans le fichier STL
@@ -101,7 +91,7 @@ if __name__ == "__main__":
     # sauvegarder dans un fichier xyz pour visualiser avec open3d
     xyz_file_path = os.path.join('./', "3d_object.xyz")
     with open(xyz_file_path, 'w') as xyz_file:
-        for img_coords in coords_per_image_transformed:
+        for img_coords in coords_per_image:
             for coord in img_coords:
                 xyz_file.write(f"{coord[0]} {coord[1]} {coord[2]}\n")
     print(f"✅ Fichier XYZ créé avec succès : {xyz_file_path}")

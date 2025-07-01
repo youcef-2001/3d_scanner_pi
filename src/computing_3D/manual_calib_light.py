@@ -99,22 +99,7 @@ while True:
     key = cv2.waitKey(int(1000 / fps)) & 0xFF
     if key == ord('q'):
         break
-    # if the arrows keys are pressed, change the origin point of the camera
-    elif key == ord('a'):
-        # Move left
-        origin_point = (origin_point[0] - 10, origin_point[1])
-    elif key == ord('d'):
-        # Move right
-        origin_point = (origin_point[0] + 10, origin_point[1])
-    elif key == ord('w'):
-        # Move up
-        origin_point = (origin_point[0], origin_point[1] - 10)
-    elif key == ord('s'):
-        # Move down
-        origin_point = (origin_point[0], origin_point[1] + 10)  
-    elif key == ord('r'):
-        # Reset origin point to center
-        origin_point = (frame.shape[1] // 2, frame.shape[0] // 2)
+   
 
     i += 1
 
