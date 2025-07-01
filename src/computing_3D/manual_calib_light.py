@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 import os
-
+from utils import IMAGE_FOLDER
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/images/lundi/images/acquisition_30_06_19_28'
+
 image_files = sorted([
     os.path.join(IMAGE_FOLDER, f)
     for f in os.listdir(IMAGE_FOLDER)
