@@ -35,7 +35,15 @@ if __name__ == "__main__":
                 f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         picam2 = Picamera2()
         mytransform = Transform(rotation=180)
-        config = picam2.create_still_configuration(main={"size": (1920, 1080)})
+        #5mp = (2592, 1944) ratio 4/3
+        #4mp = (1440, 1080) ratio 
+        #3mp = (1296, 972)
+        #2mp = (1920, 1080)
+        #1mp = (1280, 720)
+        #ratio = 6/5
+        #4 mp  with ratio 6/5 = 
+        config = picam2.create_still_configuration(main={"size": (1280, 1280)})
+        picam2.set_transform(mytransform)
         picam2.start()
         time.sleep(1)
         i = 0

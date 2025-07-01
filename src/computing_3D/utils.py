@@ -20,17 +20,17 @@ Distortion Coefficients:
 
 # === Dossier des images ===
 IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/images/acquisition_01_07_11_07'
-DISTANCE_CAMERA_LASER = 6.8# in cm 
-DEGREE_CAMERA_CENTER_LASER = 12 # in degree
+DISTANCE_CAMERA_LASER = 7.4# in cm 
 INITIAL_CAMERA_DEGREE = 90
-INITIAL_LASER_DEGREE = 78
+INITIAL_LASER_DEGREE = 76.8
+
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
-VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 255, 255, 229, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (169, 205, 205, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+VERTICAL_FOV = 54 # in degree, vertical field of view of the camera
+HSV_FILTRE= (0, 0, 255, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (190, 190, 113, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 3.6 # in mm, focal length of the camera
 PIXEL_SIZE=1.4e-6
-DISTANCE_CAMERA_ROTATION_CENTER = 27.5 # in cm, distance between the camera and the rotation center of the platform
+DISTANCE_CAMERA_ROTATION_CENTER = 25.5 # in cm, distance between the camera and the rotation center of the platform
 
 # === Appliquer le filtre  HSV ou RGB ===
 def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
@@ -69,12 +69,13 @@ def compute_spherique_coords(px,py,width, height):
     ratio = DISTANCE_CAMERA_LASER / math.sin(math.radians(laser_obj_cam_deg)) 
     # calculer la distance entre la caméra et l'objet sur axe x
     d = ratio * math.sin(math.radians(INITIAL_LASER_DEGREE)) 
+    #print(f'distance {d}')
     # calculer la distance entre la caméra et l'objet sur axe y
     delta_pixels = py - (height / 2)
     latitude = (delta_pixels * VERTICAL_FOV / height)  # Différence en pixels par rapport au centre de l'image
     delta_real = abs(delta_pixels * d * PIXEL_SIZE / FOCALE)
     distance = math.sqrt(d**2 + delta_real**2)  # Distance totale
-
+    #print(f"Distance: {distance:.2f} cm, Latitude: {latitude:.2f}°, Longitude: {longitude:.2f}°")
     return distance,latitude,longitude
 
 
@@ -92,10 +93,14 @@ def spherical_to_cartesian(r, long, latitude):
     lat_rad = math.radians(latitude)
 
     # Calculer les coordonnées cartésiennes
-    x = r * math.cos(lat_rad) * math.cos(long_rad)
-    y = r * math.cos(lat_rad) * math.sin(long_rad)
-    z = r * math.sin(lat_rad)
-
+    # axe verticale est l'axe Y relation avec height de l'image
+    # axe horizontale est le X relation avec width de l'image
+    # axe de rotation est l'axe Y
+    # l'axe de profondeur Z sera l'axe de la plateforme relation avec distance de la caméra au centre de rotation
+    x = r * math.cos(lat_rad) * math.cos(long_rad)  # axe X
+    y = r * math.sin(lat_rad)  # axe Y
+    z = r * math.cos(lat_rad) * math.sin(long_rad)  # axe
+    #print(x,y,z)
     return x, y, z
 
 
@@ -108,7 +113,7 @@ def get_rotation_center_coordinates():
     return 0,0,0  # Le centre de rotation est à l'origine du système de coordonnées (0, 0, 0)
 
 
-def get_camera_coordinates(degree,init_x= 0, init_y=0, init_z=DISTANCE_CAMERA_ROTATION_CENTER):
+def get_camera_coordinates(degree,init_x= 0, init_y=0, init_z=-DISTANCE_CAMERA_ROTATION_CENTER):
     """
     Retourne les coordonnées de la caméra.
     """
@@ -138,9 +143,9 @@ def  camerapoint_to_centerpoint(cam_coords, px, py, width, height):
     # la regle est   P' = P+C ou C est la camera  et 
     # P' est le point dans le systeme de coordonnees du centre de rotation
     x1, y1, z1 = cam_coords
-    x_center = x + x1
-    y_center = y + y1   
-    z_center = z - z1# car la camera est a l'opposée de la plateforme
+    x_center = x + x1# axe horizontale
+    y_center = y + y1 # axe verticale  et de rotation
+    z_center = z + z1# axe profondeur
     
     return x_center, y_center, z_center
 
