@@ -42,7 +42,7 @@ if __name__ == "__main__":
         turn_on_laser()
         print("🔴 Laser allumé !")
         tfluna_acqu = []
-        while temps_Deb-time.time() < 5:  # Durée de capture de 60 secondes
+        while time.time()-temps_Deb < 5:  # Durée de capture de 60 secondes
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
