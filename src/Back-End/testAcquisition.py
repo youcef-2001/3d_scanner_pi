@@ -1,5 +1,6 @@
 from picamera2 import Picamera2
 import RPi.GPIO as GPIO
+from picamera2.utils import Transform
 from datetime import datetime
 import socket
 import getpass
@@ -39,42 +40,39 @@ def Scan_3D():
         with open(csv_file, "a") as f:
                 f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
         picam2 = Picamera2()
-        config = picam2.create_still_configuration(
-        main={"size": (2592, 1944)},  # 5MP
-        controls={
-        "ExposureTime": 5000,         # Légèrement plus long (12 ms) = plus de lumière sans trop de flou
-        "AnalogueGain": 0.5,          # Gain minimum = bruit minimal (mais dépend de l'éclairage)
-        "NoiseReductionMode": 1,      # High quality (tu es bon ici)
-        "Sharpness": 1.7,             # Pousse un peu plus pour renforcer les bords
-        "Contrast": 1.1,              # Un léger contraste renforce la perception de netteté
-        "Saturation": 1.2,            # Améliore le réalisme de l’image (optionnel)
-        "AwbMode": 1,                 # Auto white balance (correct sauf si tu veux du fixe)
-        "AeExposureMode": "Short",    # Continue à forcer les expositions courtes
-        "MeteringMode": 1             }
-        )
+        mytransform = Transform(rotation=180)
+        #5mp = (2592, 1944) ratio 4/3
+        #4mp = (1440, 1080) ratio 
+        #3mp = (1296, 972)
+        #2mp = (1920, 1080)
+        #1mp = (1280, 720)
+        #ratio = 6/5
+        #4 mp  with ratio 6/5 = 
+        config = picam2.create_still_configuration(main={"size": (1280, 1280)},transform = mytransform)
         picam2.start()
         time.sleep(1)
         i = 0
         temps_Deb = time.time()
         turn_on_laser()
         print("🔴 Laser allumé !")
-
-        while isScanning:
+        tfluna_acqu = []
+        while time.time()-temps_Deb < 30:  # Durée de capture de 20 secondes
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            picam2.options["quality"] = 99
             # Capture d'image avec la caméra
             picam2.capture_file(filename)
             # capture egalement les donnees du capteur de distance
-
             distance,amplitude,temperature,ticks,error = tf.read_data()
-            with open(csv_file, "a") as f:
-                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
+            tfluna_acqu.append((distance,amplitude,temperature,ticks,error))
             print(f"📷 Image {i:05d} capturée : {filename} - Distance : {distance} cm")
             temps_totale = time.time() - temps_Deb
             print(f"⏱ Temps écoulé : {temps_totale:.2f} secondes")
             i += 1
         print("✅ Durée de capture atteinte.")
 
+        with open(csv_file, "a") as f:
+            for j, (distance, amplitude, temperature, ticks, error) in enumerate(tfluna_acqu):
+                # Écriture des données dans le fichier CSV
+                f.write(f"{i:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
     except KeyboardInterrupt:
         print("🛑 Arrêt par l'utilisateur.")
 
