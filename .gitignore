@@ -8,3 +8,4 @@ lib64
 pyvenv.cfg
 venv
 3d_object.*
+src/computing_3D/__pycache__
