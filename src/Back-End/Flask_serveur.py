@@ -1,7 +1,9 @@
 from threading import Thread
 from flask import Flask, jsonify, Response, send_file, request
 #import RPi.GPIO as GPIO
-#from picamera2 import Picamera2
+from Picamera2 import Picamera2, MappedArray
+import cv2
+import numpy as np
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -133,6 +135,36 @@ def annuler_acquisition():
             "status": "error",
             "message": str(e)
         }), 500
+
+def generate_mjpeg():
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"size": (640, 480)},  # taille plus légère pour le flux
+        controls={"FrameRate": 20}
+    )
+    picam2.configure(config)
+    picam2.start()
+
+    try:
+        while True:
+            frame = picam2.capture_array()
+            # Encode OpenCV BGR to JPEG
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            if not ret:
+                continue
+            # Yield MJPEG chunk
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
+    except GeneratorExit:
+        picam2.stop()
+    finally:
+        picam2.stop()
+
+@app.route('/camera/video_feed')
+def video_feed():
+    return Response(generate_mjpeg(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 if __name__ == '__main__':
     try:
