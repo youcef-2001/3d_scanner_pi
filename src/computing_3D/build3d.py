@@ -22,16 +22,17 @@ if __name__ == "__main__":
     degree =0
     # notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete
-    # ayant 15.6 FPS
+    # ayant 15.5 FPS
     # donc 15 secondes * 15.6 FPS = 234 images par rotation
     # donc 234 images pour une rotation de 360°
     while  i < len(image_files):
         image_path = image_files[i]
-        degree = (i % 234) * (360 / 234)  # Calculer le degré de rotation pour chaque image
+        degree = (i % 223) * (360 / 223)  # Calculer le degré de rotation pour chaque image
         # === Calculer les coordonnées de la caméra ===
         camera_coords = get_camera_coordinates(degree)
         # === Lire l'image ===
         frame = cv2.imread(image_path)
+        frame = cv2.rotate(frame, cv2.ROTATE_180)
         if frame is None:
             print(f"❌ Impossible de lire l'image {image_path}.")
             i += 1
@@ -54,7 +55,6 @@ if __name__ == "__main__":
             for x,y in myzip :
                         x,y,z= camerapoint_to_centerpoint(camera_coords,x,y,width, height)
                         coords_per_pixel.append((x, y, z))
-                        
             coords_per_image.append(coords_per_pixel)
             # transformer les points de chaque image a un origin commun
         i += 1

@@ -19,18 +19,17 @@ Distortion Coefficients:
 """
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/images/acquisition_01_07_11_07'
-DISTANCE_CAMERA_LASER = 7.4# in cm 
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/archive/acquisition_01_07_20_29'
+DISTANCE_CAMERA_LASER = 0.074# in m
 INITIAL_CAMERA_DEGREE = 90
-INITIAL_LASER_DEGREE = 76.8
-
+INITIAL_LASER_DEGREE = 77
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
-VERTICAL_FOV = 54 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 255, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (190, 190, 113, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
-FOCALE = 3.6 # in mm, focal length of the camera
-PIXEL_SIZE=1.4e-6
-DISTANCE_CAMERA_ROTATION_CENTER = 25.5 # in cm, distance between the camera and the rotation center of the platform
+VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
+HSV_FILTRE= (0, 0, 156, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (75, 77, 55, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+FOCALE = 0.0036 # in m, focal length of the camera
+PIXEL_SIZE=1.4e-6 # in m, size of a pixel in the camera sensor
+DISTANCE_CAMERA_ROTATION_CENTER = 0.07 # in m, distance between the camera and the rotation center of the platform
 
 # === Appliquer le filtre  HSV ou RGB ===
 def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
@@ -60,9 +59,8 @@ def compute_spherique_coords(px,py,width, height):
     Returns the distance between the camera and the object, the latitude, and the longitude of the object in the spherical coordinate system.
     """
     #calculer le degré de l'angle  Laser_Camera_Object
-    longitude =  (px - (width/2) )* (HORIZONTAL_FOV / width) # Différence en pixels par rapport au centre de l'image
+    longitude =  (-px + (width/2) )* (HORIZONTAL_FOV / width) # Différence en pixels par rapport au centre de l'image
     laser_cam_obj_deg = INITIAL_CAMERA_DEGREE + longitude  # en degré
-    # calculer le degré de l'angle Laser_Object_Camera
     # calculer le degré de l'angle Laser_Object_Camera
     laser_obj_cam_deg = 180 - laser_cam_obj_deg - INITIAL_LASER_DEGREE # en degré
     # ratio de triangulation 
@@ -73,7 +71,7 @@ def compute_spherique_coords(px,py,width, height):
     # calculer la distance entre la caméra et l'objet sur axe y
     delta_pixels = py - (height / 2)
     latitude = (delta_pixels * VERTICAL_FOV / height)  # Différence en pixels par rapport au centre de l'image
-    delta_real = abs(delta_pixels * d * PIXEL_SIZE / FOCALE)
+    delta_real = delta_pixels * d * PIXEL_SIZE / FOCALE
     distance = math.sqrt(d**2 + delta_real**2)  # Distance totale
     #print(f"Distance: {distance:.2f} cm, Latitude: {latitude:.2f}°, Longitude: {longitude:.2f}°")
     return distance,latitude,longitude
@@ -97,9 +95,9 @@ def spherical_to_cartesian(r, long, latitude):
     # axe horizontale est le X relation avec width de l'image
     # axe de rotation est l'axe Y
     # l'axe de profondeur Z sera l'axe de la plateforme relation avec distance de la caméra au centre de rotation
-    x = r * math.cos(lat_rad) * math.cos(long_rad)  # axe X
-    y = r * math.sin(lat_rad)  # axe Y
-    z = r * math.cos(lat_rad) * math.sin(long_rad)  # axe
+    x = r * math.sin(lat_rad) * math.sin(long_rad)  # axe X
+    y = r * math.cos(lat_rad)  # axe Y
+    z = r * math.sin(lat_rad) * math.cos(long_rad)  # axe
     #print(x,y,z)
     return x, y, z
 
@@ -136,8 +134,7 @@ def  camerapoint_to_centerpoint(cam_coords, px, py, width, height):
     Retourne les coordonnées (x, y, z) de l'objet dans le système de coordonnées du centre de rotation.
     """
     distance, latitude, longitude = compute_spherique_coords(px, py, width, height)
-    x, y, z = spherical_to_cartesian(distance, longitude, latitude)
-    
+    x, y, z = spherical_to_cartesian(distance, longitude, latitude)     
     # pour transferer lescoords du la camera vers le centre de rotation
     #etant donner qu'il ya pas de rotation de la camera
     # la regle est   P' = P+C ou C est la camera  et 
@@ -151,18 +148,15 @@ def  camerapoint_to_centerpoint(cam_coords, px, py, width, height):
 
 
 #le K donner par default est issue d'une precedente calibration de la camera
-def estimate_camera_poses(image_paths, K=np.array([[305.83777934, 0, 316.16069303],
-                                                   [0, 304.78118715, 229.49325219],
+def estimate_camera_poses(image_paths, K=np.array([[302.83777934, 0, 320],
+                                                   [0, 301.78118715, 240],
                                                    [0, 0, 1]])):
     poses = [np.eye(4)]  # première pose = identité (origine)
-    
     sift = cv2.SIFT_create()
     FLANN_INDEX_KDTREE = 1
     flann = cv2.FlannBasedMatcher(dict(algorithm=FLANN_INDEX_KDTREE, trees=5), dict(checks=50))
-
     prev_img = cv2.imread(image_paths[0], cv2.IMREAD_GRAYSCALE)
     kp1, des1 = sift.detectAndCompute(prev_img, None)
-
     for idx in range(1, len(image_paths)):
         curr_img = cv2.imread(image_paths[idx], cv2.IMREAD_GRAYSCALE)
         kp2, des2 = sift.detectAndCompute(curr_img, None)
