@@ -1,35 +1,23 @@
 import cv2
 import numpy as np
 import math
-"""First test with paper  chessboard calibration
-Camera Matrix (Intrinsics):
-[[283.52584547   0.         317.4817892 ]
- [  0.         285.4622619  221.27073088]
- [  0.           0.           1.        ]]
-Distortion Coefficients:
- [[ 0.04365984 -0.01581748  0.00112492  0.00088643  0.00136511]]
-"""
-""" Second test with screen Macbook calibration
-Camera Matrix (Intrinsics):
- [[305.83777934   0.         316.16069303]
- [  0.         304.78118715 229.49325219]
- [  0.           0.           1.        ]]
-Distortion Coefficients:
- [[ 0.05471393 -0.36118367 -0.00134342 -0.00132277  0.72260052]]
-"""
+
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/archive/acquisition_01_07_20_29'
-DISTANCE_CAMERA_LASER = 0.074# in m
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mercredi/acquisition_02_07_10_45'
+DISTANCE_CAMERA_LASER = 0.073# in m
 INITIAL_CAMERA_DEGREE = 90
-INITIAL_LASER_DEGREE = 77
+INITIAL_LASER_DEGREE = 78.5
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 156, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (75, 77, 55, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (0, 0, 230, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (200, 70, 70, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 0.0036 # in m, focal length of the camera
 PIXEL_SIZE=1.4e-6 # in m, size of a pixel in the camera sensor
-DISTANCE_CAMERA_ROTATION_CENTER = 0.07 # in m, distance between the camera and the rotation center of the platform
+DISTANCE_CAMERA_ROTATION_CENTER = 0.355 # in m, distance between the camera and the rotation center of the platform
+
+
+
 
 # === Appliquer le filtre  HSV ou RGB ===
 def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
@@ -45,6 +33,8 @@ def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
     result = cv2.bitwise_and(img, img, mask=mask)
 
     return result
+
+
 
 
 
@@ -69,7 +59,7 @@ def compute_spherique_coords(px,py,width, height):
     d = ratio * math.sin(math.radians(INITIAL_LASER_DEGREE)) 
     #print(f'distance {d}')
     # calculer la distance entre la caméra et l'objet sur axe y
-    delta_pixels = py - (height / 2)
+    delta_pixels = -py + (height / 2)
     latitude = (delta_pixels * VERTICAL_FOV / height)  # Différence en pixels par rapport au centre de l'image
     delta_real = delta_pixels * d * PIXEL_SIZE / FOCALE
     distance = math.sqrt(d**2 + delta_real**2)  # Distance totale
@@ -78,16 +68,18 @@ def compute_spherique_coords(px,py,width, height):
 
 
 
-def spherical_to_cartesian(r, long, latitude):
+
+
+def spherical_to_cartesian(r, longitude, latitude):
     """
     Convertit les coordonnées sphériques (distance, longitude, latitude) en coordonnées cartésiennes (x, y, z).
     r : distance de l'objet
-    long : longitude de l'objet
+    longitude : longitude de l'objet
     latitude : latitude de l'objet
     Retourne les coordonnées cartésiennes (x, y, z).
     """
     # Convertir les angles en radians
-    long_rad = math.radians(long)
+    long_rad = math.radians(longitude)
     lat_rad = math.radians(latitude)
 
     # Calculer les coordonnées cartésiennes
@@ -96,10 +88,12 @@ def spherical_to_cartesian(r, long, latitude):
     # axe de rotation est l'axe Y
     # l'axe de profondeur Z sera l'axe de la plateforme relation avec distance de la caméra au centre de rotation
     x = r * math.sin(lat_rad) * math.sin(long_rad)  # axe X
-    y = r * math.cos(lat_rad)  # axe Y
-    z = r * math.sin(lat_rad) * math.cos(long_rad)  # axe
-    #print(x,y,z)
+    z = r * math.cos(lat_rad)  # axe Y
+    y = r * math.sin(lat_rad) * math.cos(long_rad)  # axe Z
+    
     return x, y, z
+
+
 
 
 
@@ -111,40 +105,43 @@ def get_rotation_center_coordinates():
     return 0,0,0  # Le centre de rotation est à l'origine du système de coordonnées (0, 0, 0)
 
 
-def get_camera_coordinates(degree,init_x= 0, init_y=0, init_z=-DISTANCE_CAMERA_ROTATION_CENTER):
+
+
+def get_camera_coordinates(degree=0,init_x= 0, init_y=0, init_z=-DISTANCE_CAMERA_ROTATION_CENTER):
     """
     Retourne les coordonnées de la caméra.
     """
-    # Rotation de la caméra autour de l'axe Y hauteur
-    angle_rad = math.radians(degree)
-    x = init_x * math.cos(angle_rad) + init_z * math.sin(angle_rad)
-    y = init_y
-    z = -init_x * math.sin(angle_rad) + init_z * math.cos(angle_rad)
+    return init_x, init_y, init_z  # La caméra est supposée être à une distance fixe du centre de rotation sur l'axe Z
 
-    return x, y, z  # Retourne les coordonnées de la caméra dans le système de coordonnées du centre de rotation
 
-def  camerapoint_to_centerpoint(cam_coords, px, py, width, height):
-    """
-    Transforme les coordonnées de l'objet détecté par la caméra en coordonnées du centre de rotation.
-    degree : degré de la caméra
-    px : coordonnée x de l'objet dans l'image
-    py : coordonnée y de l'objet dans l'image
-    width : largeur de l'image
-    height : hauteur de l'image
-    Retourne les coordonnées (x, y, z) de l'objet dans le système de coordonnées du centre de rotation.
-    """
+
+
+
+
+def camerapoint_to_centerpoint(cam_coords, px, py, width, height,theta):
+    
+    theta = np.deg2rad(theta)
     distance, latitude, longitude = compute_spherique_coords(px, py, width, height)
     x, y, z = spherical_to_cartesian(distance, longitude, latitude)     
-    # pour transferer lescoords du la camera vers le centre de rotation
-    #etant donner qu'il ya pas de rotation de la camera
-    # la regle est   P' = P+C ou C est la camera  et 
-    # P' est le point dans le systeme de coordonnees du centre de rotation
-    x1, y1, z1 = cam_coords
-    x_center = x + x1# axe horizontale
-    y_center = y + y1 # axe verticale  et de rotation
-    z_center = z + z1# axe profondeur
-    
-    return x_center, y_center, z_center
+    P_C = np.array([[x], [y], [z]])  # Point dans le repère de la caméra vecteur colonne
+    xc, yc, zc = cam_coords  # Coordonnées de la caméra
+    t_C_to_O = np.array([[xc],[yc],[zc]])# Translation de la caméra au centre de rotation, en vecteur colonne
+    # Rotation autour de l'axe Y (repère O) 
+    # rotation inverse pour revenir au moment 0
+    # etant donner que la camera et fixe et seulement prend des capture a des moment t diffrent 
+    R_y = np.array([
+        [ np.cos(-theta), 0, np.sin(-theta)],
+        [ 0,             1, 0            ],
+        [-np.sin(-theta), 0, np.cos(-theta)]
+    ])
+    # Calcul de la position dans le repère O
+    # il translate puis le fait tourner
+    P_O = R_y @ (P_C + t_C_to_O)
+    # return un tuple x,y,z
+    return P_O[0, 0], P_O[1, 0], P_O[2, 0]  # Retourne les coordonnées (x, y, z) dans le repère O
+
+
+
 
 
 #le K donner par default est issue d'une precedente calibration de la camera

@@ -20,16 +20,23 @@ if __name__ == "__main__":
     i = 0
     coords_per_image = []
     degree =0
-    # notre plateforme tourne a 4 rotation par minute
+    """ les coords de la camera fixe seront prochainement en fonction
+    de la profondeur  , hauteur et angle de capture par rapport au 
+    centre de rotation"""
+    
+    camera_coords = get_camera_coordinates(degree)
+    
+    
+    ''' notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete
-    # ayant 15.5 FPS
-    # donc 15 secondes * 15.6 FPS = 234 images par rotation
-    # donc 234 images pour une rotation de 360°
+    # ayant 15.2 FPS
+    # donc 13.6 secondes * 15.2 FPS =  207.2 images
+    # donc 234 images pour une rotation de 360°'''
     while  i < len(image_files):
         image_path = image_files[i]
-        degree = (i % 223) * (360 / 223)  # Calculer le degré de rotation pour chaque image
-        # === Calculer les coordonnées de la caméra ===
-        camera_coords = get_camera_coordinates(degree)
+        # Calculer le degré de rotation pour chaque image
+        # Supposons 234 images pour une rotation complète de 360°
+        degree = (i * 360) / 224# 223 images etablie lors des test =/= 234 images
         # === Lire l'image ===
         frame = cv2.imread(image_path)
         frame = cv2.rotate(frame, cv2.ROTATE_180)
@@ -53,10 +60,10 @@ if __name__ == "__main__":
             continue
         else:    
             for x,y in myzip :
-                        x,y,z= camerapoint_to_centerpoint(camera_coords,x,y,width, height)
+                        x,y,z= camerapoint_to_centerpoint(camera_coords,x,y,width, height,degree)
                         coords_per_pixel.append((x, y, z))
             coords_per_image.append(coords_per_pixel)
-            # transformer les points de chaque image a un origin commun
+            
         i += 1
         
     #Rotation Totale , translation totale
@@ -91,7 +98,7 @@ if __name__ == "__main__":
     with open(xyz_file_path, 'w') as xyz_file:
         for img_coords in coords_per_image:
             for coord in img_coords:
-                xyz_file.write(f"{coord[0]} {coord[1]} {coord[2]}\n")
+                xyz_file.write(f"{coord[0]},{coord[1]},{coord[2]}\n")
     print(f"✅ Fichier XYZ créé avec succès : {xyz_file_path}")
     
     
