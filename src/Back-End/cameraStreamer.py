@@ -6,6 +6,7 @@ import time
 
 
 
+
 class CameraStreamer:
     def __init__(self,logger):
         self.picam2 = None
@@ -13,6 +14,7 @@ class CameraStreamer:
         self.lock = threading.Lock()
         self.frame_count = 0
         self.last_frame_time = time.time()
+        self.logger = logger
         
     def initialize_camera(self):
         """Initialise la caméra avec les paramètres optimisés"""
@@ -34,11 +36,11 @@ class CameraStreamer:
             self.picam2.configure(config)
             self.picam2.start()
             self.is_streaming = True
-            logger.info("Caméra initialisée avec succès - Résolution 1280x1280")
+            self.logger.info("Caméra initialisée avec succès - Résolution 1280x1280")
             return True
             
         except Exception as e:
-            logger.error(f"Erreur lors de l'initialisation de la caméra: {e}")
+            self.logger.error(f"Erreur lors de l'initialisation de la caméra: {e}")
             return False
     
     def stop_camera(self):
@@ -47,7 +49,7 @@ class CameraStreamer:
             if self.picam2 and self.is_streaming:
                 self.picam2.stop()
                 self.is_streaming = False
-                logger.info("Caméra arrêtée")
+                self.logger.info("Caméra arrêtée")
 
     def generate_mjpeg(self):
         """Génère le flux MJPEG optimisé"""
@@ -79,7 +81,7 @@ class CameraStreamer:
                     current_time = time.time()
                     if current_time - self.last_frame_time > 5:  # Log toutes les 5 secondes
                         fps = self.frame_count / (current_time - self.last_frame_time)
-                        logger.info(f"FPS: {fps:.2f}")
+                        self.logger.info(f"FPS: {fps:.2f}")
                         self.frame_count = 0
                         self.last_frame_time = current_time
                     
@@ -93,8 +95,8 @@ class CameraStreamer:
                     time.sleep(0.033)  # ~30 FPS max
                     
         except GeneratorExit:
-            logger.info("Client déconnecté du flux vidéo")
+            self.logger.info("Client déconnecté du flux vidéo")
         except Exception as e:
-            logger.error(f"Erreur dans generate_mjpeg: {e}")
+            self.logger.error(f"Erreur dans generate_mjpeg: {e}")
         finally:
             self.stop_camera()
