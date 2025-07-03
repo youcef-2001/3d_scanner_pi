@@ -235,7 +235,14 @@ def camera_status():
     
     """Route pour vérifier le statut de la caméra, la demmarer si elle n'est pas en cours d'utilisation, et renvoyer les détails de la caméra"""
     
-    
+    if not camera_manager.isCameraRunning:
+        try:
+            config = {"main": {"size": (1280, 1280)}}
+            camera_manager.start_camera(config)
+            logger.info("Caméra démarrée pour le statut")
+        except Exception as e:
+            logger.error(f"Erreur lors du démarrage de la caméra: {e}")
+           
     logger.info(f"camera_streamer.is_streaming: {camera_manager.isCameraRunning}")
     return jsonify({
         'connected': camera_manager.isCameraRunning,
