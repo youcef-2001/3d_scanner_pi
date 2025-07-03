@@ -168,7 +168,13 @@ def video_feed():
 
 @app.route('/camera/status')
 def camera_status():
-    """Route pour vérifier le statut de la caméra"""
+    
+    """Route pour vérifier le statut de la caméra, la demmarer si elle n'est pas en cours d'utilisation, et renvoyer les détails de la caméra"""
+    
+    if not camera_streamer.is_streaming:
+        logger.info("Caméra non en cours d'utilisation, tentative de démarrage")
+        if not camera_streamer.initialize_camera():
+            logger.error("Échec de l'initialisation de la caméra")
     logger.info(f"camera_streamer.is_streaming: {camera_streamer.is_streaming}")
     return jsonify({
         'connected': camera_streamer.is_streaming,

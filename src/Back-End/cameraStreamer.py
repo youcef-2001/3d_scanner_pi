@@ -19,11 +19,14 @@ class CameraStreamer:
     def initialize_camera(self):
         """Initialise la caméra avec les paramètres optimisés"""
         try:
+            if self.picam2 and self.is_streaming:
+                self.logger.info("Caméra déjà initialisée et en cours d'utilisation")
+                return True
             self.picam2 = Picamera2()
             
             # Configuration pour 1280x1280 (format carré)
             config = self.picam2.create_video_configuration(
-                main={"size": (640, 480), "format": "RGB888"},
+                main={"size": (1280, 1280)},
                 controls={
                     "FrameRate": 15,  # Réduit pour éviter la surcharge réseau
                     "ExposureTime": 33000,  # Optimise l'exposition
