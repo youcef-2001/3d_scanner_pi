@@ -23,7 +23,13 @@ if __name__ == "__main__":
     pcd.colors = o3d.utility.Vector3dVector(np.random.rand(len(points), 3))  # Random colors for each point
 
     # Create a coordinate frame at the origin
-    camera_origin_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.01, origin=(0,0,-utils.DISTANCE_CAMERA_ROTATION_CENTER))
+    #vecteur origin de la camera  qui est incline sur laxe X
+    
+    
+    camera_origin_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.01, origin=(0,utils.HEIGHT_CAMERA_ROTATION_CENTER,-utils.DISTANCE_CAMERA_ROTATION_CENTER))
+    
+    Rx =camera_origin_frame.get_rotation_matrix_from_axis_angle(np.array([ np.deg2rad(utils.DEGREE_CAMERA_ROTATION_AXES),0, 0]))
+    camera_origin_frame.rotate(Rx, center=(0, utils.HEIGHT_CAMERA_ROTATION_CENTER, -utils.DISTANCE_CAMERA_ROTATION_CENTER))
     center_origin_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.01, origin=(0, 0, 0))
 
     # Visualize the point cloud with the origin axes

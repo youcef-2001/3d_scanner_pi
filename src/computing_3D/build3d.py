@@ -2,6 +2,7 @@ from utils import *
 import os
 import cv2
 import numpy as np
+import open3d as o3d
 
 
 if __name__ == "__main__":
@@ -68,30 +69,6 @@ if __name__ == "__main__":
         
     #Rotation Totale , translation totale
 
-
-            
-    # cree un fichier stl pour lire avec blender
-    stl_file_path = os.path.join('./', "3d_object.stl")
-    coords_list = [pt for img in coords_per_image for pt in img]
-    # faire des triangles avec 3 points de 3 images consécutives
-    with open(stl_file_path, 'w') as stl_file:
-        # Écrire les triangles dans le fichier STL
-        for i in range(len(coords_list) - 2):
-            p1 = coords_list[i]
-            p2 = coords_list[i + 1]
-            p3 = coords_list[i + 2]
-            # Ajouter les triangles au fichier STL
-            # Remplacer ceci par la fonction d'écriture STL appropriée
-            stl_file.write(f"facet normal 0 0 0\n")
-            stl_file.write(f"  outer loop\n")
-            stl_file.write(f"    vertex {p1[0]} {p1[1]} {p1[2]}\n")
-            stl_file.write(f"    vertex {p2[0]} {p2[1]} {p2[2]}\n")
-            stl_file.write(f"    vertex {p3[0]} {p3[1]} {p3[2]}\n")
-            stl_file.write(f"  endloop\n")
-            stl_file.write(f"endfacet\n")
-            
-            
-    print(f"✅ Fichier STL créé avec succès : {stl_file_path}")
     
     # sauvegarder dans un fichier xyz pour visualiser avec open3d
     xyz_file_path = os.path.join('./', "3d_object.xyz")
@@ -101,6 +78,33 @@ if __name__ == "__main__":
                 xyz_file.write(f"{coord[0]},{coord[1]},{coord[2]}\n")
     print(f"✅ Fichier XYZ créé avec succès : {xyz_file_path}")
     
+    # cree un fichier STL
     
-    
+ 
+
+    # 1. Charger le nuage de points depuis un fichier .xyz
+    pcd = o3d.io.read_point_cloud("ton_fichier.xyz", format='xyz')
+
+    # 2. (Optionnel) Downsampling et nettoyage
+    pcd = pcd.voxel_down_sample(voxel_size=0.005)
+    pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
+
+    # 3. Estimer les normales pour la reconstruction
+    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=30))
+    pcd.orient_normals_consistent_tangent_plane(k=10)
+
+    # 4. Reconstruction du mesh avec Poisson
+    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=9)
+
+    # 5. Découper le mesh aux limites du nuage de points
+    bbox = pcd.get_axis_aligned_bounding_box()
+    mesh = mesh.crop(bbox)
+
+    # 6. Exporter au format STL (⚠️: STL ne gère pas la couleur ou texture)
+    o3d.io.write_triangle_mesh("mesh_final.stl", mesh)
+
+    print("✅ Mesh STL exporté avec succès !")
+
+        
+        
 

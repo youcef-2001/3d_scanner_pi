@@ -4,19 +4,19 @@ import math
 
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mercredi/acquisition_02_07_10_45'
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/archive/acquisition_01_07_20_41'
 DISTANCE_CAMERA_LASER = 0.073# in m
 INITIAL_CAMERA_DEGREE = 90
-INITIAL_LASER_DEGREE = 78.5
+INITIAL_LASER_DEGREE = 80
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 230, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (200, 70, 70, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (0, 0, 170, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (31, 31, 31, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 0.0036 # in m, focal length of the camera
 PIXEL_SIZE=1.4e-6 # in m, size of a pixel in the camera sensor
-DISTANCE_CAMERA_ROTATION_CENTER = 0.355 # in m, distance between the camera and the rotation center of the platform
-
-
+DISTANCE_CAMERA_ROTATION_CENTER = 0.167 # in m, distance between the camera and the rotation center of the platform
+DEGREE_CAMERA_ROTATION_AXES = 60 # in degree, the camera rotates around the Y axis of the platform
+HEIGHT_CAMERA_ROTATION_CENTER = 0.14 # in m, height of the camera from the rotation center of the platform
 
 
 # === Appliquer le filtre  HSV ou RGB ===
@@ -107,10 +107,14 @@ def get_rotation_center_coordinates():
 
 
 
-def get_camera_coordinates(degree=0,init_x= 0, init_y=0, init_z=-DISTANCE_CAMERA_ROTATION_CENTER):
+def get_camera_coordinates(degree=0,init_x= 0, init_y=HEIGHT_CAMERA_ROTATION_CENTER, init_z=-DISTANCE_CAMERA_ROTATION_CENTER):
     """
     Retourne les coordonnées de la caméra.
     """
+    
+    # Convertir le degré en radians
+    
+    
     return init_x, init_y, init_z  # La caméra est supposée être à une distance fixe du centre de rotation sur l'axe Z
 
 
@@ -129,14 +133,23 @@ def camerapoint_to_centerpoint(cam_coords, px, py, width, height,theta):
     # Rotation autour de l'axe Y (repère O) 
     # rotation inverse pour revenir au moment 0
     # etant donner que la camera et fixe et seulement prend des capture a des moment t diffrent 
+    
     R_y = np.array([
         [ np.cos(-theta), 0, np.sin(-theta)],
         [ 0,             1, 0            ],
         [-np.sin(-theta), 0, np.cos(-theta)]
     ])
+    
+    # la camera est legerement incliné par rapport a l'axe X de la plateforme
+    # donc on applique une rotation autour de l'axe X pour corriger l'inclinaison
+    R_x = np.array([
+        [1, 0, 0],
+        [0, np.cos(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES)), -np.sin(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES))],
+        [0, np.sin(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES)), np.cos(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES))]
+    ])
     # Calcul de la position dans le repère O
     # il translate puis le fait tourner
-    P_O = R_y @ (P_C + t_C_to_O)
+    P_O = R_y @ (R_x @ P_C + t_C_to_O)  # Appliquer la rotation et la translation
     # return un tuple x,y,z
     return P_O[0, 0], P_O[1, 0], P_O[2, 0]  # Retourne les coordonnées (x, y, z) dans le repère O
 
