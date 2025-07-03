@@ -93,6 +93,18 @@ def generate_mjpeg(camera_manager: CameraManager):
 # Routes d'authentification
 # ======================
 
+
+@app.route('/')
+def index():
+    return '''
+    <html>
+    <head><title>Flux Vidéo</title></head>
+    <body>
+        <h1>Flux MJPEG</h1>
+        <img src="/camera/video_feed" />
+    </body>
+    </html>
+    '''
 @app.route('/appairer', methods=['POST'])
 def appairer():
     try:
@@ -223,10 +235,15 @@ def video_feed():
             camera.start_camera(config)
             logger.info("Caméra démarrée pour le flux vidéo")
         stream_status = True  # Indique que le flux est actif
-        return Response( 
-                        generate_mjpeg(camera) # Capture une image pour le flux
-            ,
-            mimetype='multipart/x-mixed-replace; boundary=frame'
+        return Response(
+           generate_mjpeg(camera_manager=camera),
+            mimetype='multipart/x-mixed-replace; boundary=frame',
+            headers={
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'Connection': 'keep-alive'
+            }
         )
     except Exception as e:
         logger.error(f"Erreur lors du démarrage du flux vidéo: {e}")
