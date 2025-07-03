@@ -152,6 +152,7 @@ def annuler_acquisition():
 def video_feed():
     """Route pour le flux vidéo MJPEG"""
     try:
+        logger.info("Démarrage du flux vidéo")
         return Response(
             camera_streamer.generate_mjpeg(),
             mimetype='multipart/x-mixed-replace; boundary=frame',
@@ -169,6 +170,7 @@ def video_feed():
 @app.route('/camera/status')
 def camera_status():
     """Route pour vérifier le statut de la caméra"""
+    logger.info(f"camera_streamer.is_streaming: {camera_streamer.is_streaming}")
     return jsonify({
         'connected': camera_streamer.is_streaming,
         'resolution': '1280x1280',
@@ -180,14 +182,19 @@ def camera_status():
 def start_camera():
     """Route pour démarrer la caméra"""
     if camera_streamer.initialize_camera():
+        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
+   
         return jsonify({'success': True, 'message': 'Caméra démarrée'})
     else:
+        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
+   
         return jsonify({'success': False, 'message': 'Erreur de démarrage'}), 500
 
 @app.route('/camera/stop')
 def stop_camera():
     """Route pour arrêter la caméra"""
     camera_streamer.stop_camera()
+    logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
     return jsonify({'success': True, 'message': 'Caméra arrêtée'})
 
 
