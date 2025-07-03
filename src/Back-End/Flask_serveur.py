@@ -1,7 +1,7 @@
 from threading import Thread
 from flask import Flask, jsonify, Response, send_file, request
 #import RPi.GPIO as GPIO
-from Picamera2 import Picamera2, MappedArray
+from picamera2 import Picamera2, MappedArray
 import cv2
 import numpy as np
 import os
