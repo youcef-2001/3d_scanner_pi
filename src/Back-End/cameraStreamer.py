@@ -23,7 +23,7 @@ class CameraStreamer:
             
             # Configuration pour 1280x1280 (format carré)
             config = self.picam2.create_video_configuration(
-                main={"size": (1280, 1280), "format": "RGB888"},
+                main={"size": (640, 480), "format": "RGB888"},
                 controls={
                     "FrameRate": 15,  # Réduit pour éviter la surcharge réseau
                     "ExposureTime": 33000,  # Optimise l'exposition
@@ -55,17 +55,17 @@ class CameraStreamer:
         """Génère le flux MJPEG optimisé"""
         if not self.is_streaming:
             if not self.initialize_camera():
+                self.logger.error("Initialisation caméra échouée")
+                yield b''  # ou simplement "break" si plus clair
                 return
-        
+            
         try:
             while self.is_streaming:
                 with self.lock:
                     if not self.picam2:
-                        break
-                        
+                        break 
                     # Capture de l'image
-                    frame = self.picam2.capture_array()
-                    
+                    frame = self.picam2.capture_array("main")
                     # Conversion RGB vers BGR pour OpenCV
                     frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                     

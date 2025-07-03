@@ -205,7 +205,7 @@ if __name__ == '__main__':
         logger.info("Démarrage du serveur Flask sur 192.168.13.1:5000")
         app.run(
             host='192.168.13.1', 
-            port=5000, 
+            port=80, 
             threaded=True,
             debug=True  # Désactivé en production
         )
