@@ -1,36 +1,23 @@
 from threading import Thread
-from flask import Flask, jsonify, Response, send_file, request
-#import RPi.GPIO as GPIO
-from picamera2 import Picamera2, MappedArray
-import cv2
-import numpy as np
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from flask import Flask, jsonify, Response, request
+from cameraStreamer import CameraStreamer
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
-import time
-import io
 import jwt
-import subprocess
 from testAcquisition import Scan_3D, Stop_Scan 
-
-#from datetime import datetime
 from supabase import create_client, Client
 
-#import cv2
+
 
 app = Flask(__name__)
-
 # Configuration Supabase
 SUPABASE_URL = 'https://vwnbfnvwzfidaxfxcdqp.supabase.co'
 SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bmJmbnZ3emZpZGF4ZnhjZHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODM5NjcsImV4cCI6MjA2NTY1OTk2N30.0-vxz8pyP_KYN0TwKdlFz4k0DQlp-o16rmyQOrcLKa0'
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
-#picam2 = Picamera2()
-#picam2.configure(picam2.create_video_configuration(main={"size": (1080, 720)}))
-#picam2.start()
+# Configuration du logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+camera_streamer = CameraStreamer()
 
 
 
@@ -136,38 +123,65 @@ def annuler_acquisition():
             "message": str(e)
         }), 500
 
-def generate_mjpeg():
-    picam2 = Picamera2()
-    config = picam2.create_video_configuration(
-        main={"size": (640, 480)},  # taille plus légère pour le flux
-        controls={"FrameRate": 20}
-    )
-    picam2.configure(config)
-    picam2.start()
-
-    try:
-        while True:
-            frame = picam2.capture_array()
-            # Encode OpenCV BGR to JPEG
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            if not ret:
-                continue
-            # Yield MJPEG chunk
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
-    except GeneratorExit:
-        picam2.stop()
-    finally:
-        picam2.stop()
 
 @app.route('/camera/video_feed')
 def video_feed():
-    return Response(generate_mjpeg(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    """Route pour le flux vidéo MJPEG"""
+    try:
+        return Response(
+            camera_streamer.generate_mjpeg(),
+            mimetype='multipart/x-mixed-replace; boundary=frame',
+            headers={
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'Connection': 'keep-alive'
+            }
+        )
+    except Exception as e:
+        logger.error(f"Erreur dans video_feed: {e}")
+        return jsonify({'error': 'Erreur du flux vidéo'}), 500
+
+@app.route('/camera/status')
+def camera_status():
+    """Route pour vérifier le statut de la caméra"""
+    return jsonify({
+        'connected': camera_streamer.is_streaming,
+        'resolution': '1280x1280',
+        'format': 'MJPEG',
+        'status': 'active' if camera_streamer.is_streaming else 'inactive'
+    })
+
+@app.route('/camera/start')
+def start_camera():
+    """Route pour démarrer la caméra"""
+    if camera_streamer.initialize_camera():
+        return jsonify({'success': True, 'message': 'Caméra démarrée'})
+    else:
+        return jsonify({'success': False, 'message': 'Erreur de démarrage'}), 500
+
+@app.route('/camera/stop')
+def stop_camera():
+    """Route pour arrêter la caméra"""
+    camera_streamer.stop_camera()
+    return jsonify({'success': True, 'message': 'Caméra arrêtée'})
+
+
 
 
 if __name__ == '__main__':
     try:
-        app.run(host='192.168.13.1', port=5000, threaded=True)
+        logger.info("Démarrage du serveur Flask sur 192.168.13.1:5000")
+        app.run(
+            host='192.168.13.1', 
+            port=5000, 
+            threaded=True,
+            debug=False  # Désactivé en production
+        )
+    except KeyboardInterrupt:
+        logger.info("Arrêt du serveur demandé")
+    except Exception as e:
+        logger.error(f"Erreur lors du démarrage: {e}")
     finally:
-        print("Server stopped.")
+        camera_streamer.stop_camera()
+        logger.info("Serveur arrêté proprement")
