@@ -12,7 +12,7 @@ if __name__ == "__main__":
     points = []
     with open(xyz_file_path, 'r') as xyz_file:
         for line in xyz_file:
-            x, y, z = map(float, line.strip().split(','))
+            x, y, z = map(float, line.strip().split())
             points.append([x, y, z])
     points = np.array(points)
     

@@ -75,7 +75,12 @@ if __name__ == "__main__":
     with open(xyz_file_path, 'w') as xyz_file:
         for img_coords in coords_per_image:
             for coord in img_coords:
-                xyz_file.write(f"{coord[0]},{coord[1]},{coord[2]}\n")
+                xyz_file.write(f"{coord[0]} {coord[1]} {coord[2]}\n")
+                
+    ## add normals  in the point cloud 
+    
+    
+    
     print(f"✅ Fichier XYZ créé avec succès : {xyz_file_path}")
     
     # cree un fichier STL
@@ -83,25 +88,25 @@ if __name__ == "__main__":
  
 
     # 1. Charger le nuage de points depuis un fichier .xyz
-    pcd = o3d.io.read_point_cloud("ton_fichier.xyz", format='xyz')
+    pcd = o3d.io.read_point_cloud("./3d_object.xyz", format='xyz')
 
     # 2. (Optionnel) Downsampling et nettoyage
-    pcd = pcd.voxel_down_sample(voxel_size=0.005)
-    pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
+    pcd = pcd.voxel_down_sample(voxel_size=0.0045)
+    pcd.remove_statistical_outlier(nb_neighbors=10, std_ratio=2.2)
 
     # 3. Estimer les normales pour la reconstruction
-    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=30))
-    pcd.orient_normals_consistent_tangent_plane(k=10)
+    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=10))
+    pcd.orient_normals_consistent_tangent_plane(k=8)
 
     # 4. Reconstruction du mesh avec Poisson
-    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=9)
+    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=10)
 
     # 5. Découper le mesh aux limites du nuage de points
     bbox = pcd.get_axis_aligned_bounding_box()
     mesh = mesh.crop(bbox)
-
+    mesh.compute_vertex_normals()
     # 6. Exporter au format STL (⚠️: STL ne gère pas la couleur ou texture)
-    o3d.io.write_triangle_mesh("mesh_final.stl", mesh)
+    o3d.io.write_triangle_mesh("./3d_object.stl", mesh)
 
     print("✅ Mesh STL exporté avec succès !")
 
