@@ -37,7 +37,7 @@ def Scan_3D():
 
         picammanager = CameraManager.get_instance( logging.getLogger(__name__))
         mytransform = Transform(rotation=180)
-        config = {"main":{"size": (1280, 1280)}, "transform":mytransform}
+        config = {"main":{"size": (1280, 1280)}, "transform":mytransform,"format": "RGB888"}
         picammanager.start_camera(config)
         time.sleep(0.5)
         i = 0
