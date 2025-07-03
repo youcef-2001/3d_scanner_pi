@@ -65,7 +65,30 @@ def appairer():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
         
-        
+   #route deconnecter     
+@app.route('/deconnecter', methods=['POST'])
+def deconnecter():
+    try:
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Token JWT manquant"}), 401
+
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, options={"verify_signature": False})
+        user_email = payload.get("email")
+        user_id = payload.get("sub")
+
+        print(f"[Déconnexion] Utilisateur : {user_email}, ID: {user_id}")
+
+        return jsonify({
+            "status": "success",
+            "message": "Déconnexion réussie"
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
 # Allumer le laser
 @app.route('/laser/on', methods=['POST'])
 def laser_on():
