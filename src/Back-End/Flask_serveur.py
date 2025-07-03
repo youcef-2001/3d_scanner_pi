@@ -6,6 +6,7 @@ from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
 from testAcquisition import Scan_3D, Stop_Scan 
 from supabase import create_client, Client
+import logging
 
 
 
