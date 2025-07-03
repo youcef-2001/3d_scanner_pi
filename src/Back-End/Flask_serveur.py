@@ -200,7 +200,7 @@ if __name__ == '__main__':
             host='192.168.13.1', 
             port=5000, 
             threaded=True,
-            debug=False  # Désactivé en production
+            debug=True  # Désactivé en production
         )
     except KeyboardInterrupt:
         logger.info("Arrêt du serveur demandé")
