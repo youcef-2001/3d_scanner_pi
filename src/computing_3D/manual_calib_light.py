@@ -98,9 +98,7 @@ while True:
 
     key = cv2.waitKey(int(1000 / fps)) & 0xFF
     if key == ord('q'):
-        break
-   
-
+        break   
     i += 1
 
 cv2.destroyAllWindows()
