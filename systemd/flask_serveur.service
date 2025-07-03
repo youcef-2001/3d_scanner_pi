@@ -1,0 +1,13 @@
+[Unit]
+Description=Flask 3D Scanner Server
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/3d_scanner_pi/src/Back-End
+ExecStart=/usr/bin/python3 /home/pi/3d_scanner_pi/src/Back-End/Flask_serveur.py
+Restart=always
+Environment=FLASK_ENV=production
+
+[Install]
+WantedBy=multi-user.target
