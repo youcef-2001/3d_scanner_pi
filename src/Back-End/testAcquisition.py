@@ -1,6 +1,7 @@
-from picamera2 import Picamera2
+from cameraManager import CameraManager
 import RPi.GPIO as GPIO
 from picamera2.utils import Transform
+import logging
 from datetime import datetime
 import socket
 import getpass
@@ -33,12 +34,11 @@ def Scan_3D():
         with open(csv_file, "a") as f:
             f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
 
-        picam2 = Picamera2()
+        picammanager = CameraManager.get_instance( logging.getLogger(__name__))
         mytransform = Transform(rotation=180)
-        config = picam2.create_still_configuration(main={"size": (1280, 1280)}, transform=mytransform)
-        picam2.configure(config)
-        picam2.start()
-        time.sleep(1)
+        config = {"main":{"size": (1280, 1280)}, "transform":mytransform}
+        picammanager.start_camera(config)
+        time.sleep(0.5)
         i = 0
         temps_Deb = time.time()
         turn_on_laser()
@@ -47,7 +47,7 @@ def Scan_3D():
 
         while isScanning and time.time() - temps_Deb < 30:
             filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
-            picam2.capture_file(filename)
+            picammanager.capture_file(filename)
             distance, amplitude, temperature, ticks, error = tf.read_data()
             tfluna_acqu.append((distance, amplitude, temperature, ticks, error))
             print(f"📷 Image {i:05d} capturée - Distance : {distance} cm")
@@ -66,8 +66,8 @@ def Scan_3D():
     finally:
         turn_off_laser()
         print("💡 Laser éteint.")
-        if 'picam2' in locals():
-            picam2.stop()
+        picammanager.stop_camera()
+        print("📷 Caméra arrêtée.")
         cleanup()
         print("✅ Nettoyage terminé.")
 

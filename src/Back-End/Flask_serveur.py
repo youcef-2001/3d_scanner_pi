@@ -1,6 +1,6 @@
 from threading import Thread
 from flask import Flask, jsonify, Response, request
-from cameraStreamer import CameraStreamer
+from cameraManager import CameraManager
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
@@ -19,7 +19,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-camera_streamer = CameraStreamer(logger=logger)
+camera_manager = CameraManager(logger)
 is_acquisition_running= False
 
 
@@ -118,7 +118,7 @@ def read_tfluna():
 #start_acquisition
 
 def wrapped_scan():
-    global is_acquisition_running
+    global is_acquisition_running 
     try:
         Scan_3D()
     finally:
