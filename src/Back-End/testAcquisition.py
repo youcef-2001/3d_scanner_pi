@@ -1,5 +1,4 @@
 from cameraManager import CameraManager
-import RPi.GPIO as GPIO
 from picamera2.utils import Transform
 import logging
 from datetime import datetime
@@ -13,12 +12,14 @@ from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 
 username = getpass.getuser()
-isScanning = True
+isScanning = False
 
 def Stop_Scan():
     global isScanning
     print("🛑 Demande d'arrêt reçue.")
+    
     isScanning = False
+    
 
 def Scan_3D():
     global isScanning

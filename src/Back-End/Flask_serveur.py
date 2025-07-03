@@ -7,7 +7,6 @@ import jwt
 from testAcquisition import Scan_3D, Stop_Scan 
 from supabase import create_client, Client
 import logging
-import subprocess
 
 
 
@@ -19,7 +18,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-camera_manager = CameraManager(logger)
+camera_manager = CameraManager.get_instance(logger)
 is_acquisition_running= False
 
 
@@ -151,9 +150,12 @@ def annuler_acquisition():
 def video_feed():
     """Route pour le flux vidéo MJPEG"""
     try:
+        camera_manager.get_instance(logger)  # Assure que l'instance est initialisée
+        if not camera_manager.is_streaming :
+            camera_manager.start_camera('streaming')
         logger.info("Démarrage du flux vidéo")
         return Response(
-            camera_streamer.generate_mjpeg(),
+            camera_manager.generate_mjpeg(),
             mimetype='multipart/x-mixed-replace; boundary=frame',
             headers={
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
