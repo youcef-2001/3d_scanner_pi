@@ -18,7 +18,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-camera_streamer = CameraStreamer()
+camera_streamer = CameraStreamer(logger=logger)
 
 
 
