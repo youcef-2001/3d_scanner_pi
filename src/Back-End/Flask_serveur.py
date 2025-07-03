@@ -218,7 +218,7 @@ def video_feed():
     camera = CameraManager.get_instance(logger)
     try:
         if not camera.isCameraRunning:
-            config = {"main": {"size": (1280, 1280)},"format": "RGB888"}
+            config = 'streaming'  # Configuration par défaut pour la caméra
             camera.start_camera(config)
             logger.info("Caméra démarrée pour le flux vidéo")
         stream_status = True  # Indique que le flux est actif
