@@ -151,7 +151,7 @@ def video_feed():
     """Route pour le flux vidéo MJPEG"""
     try:
         camera_manager.get_instance(logger)  # Assure que l'instance est initialisée
-        if not camera_manager.is_streaming :
+        if not camera_manager.isStreaming :
             camera_manager.start_camera('streaming')
         logger.info("Démarrage du flux vidéo")
         return Response(
@@ -173,16 +173,13 @@ def camera_status():
     
     """Route pour vérifier le statut de la caméra, la demmarer si elle n'est pas en cours d'utilisation, et renvoyer les détails de la caméra"""
     
-    if not camera_streamer.is_streaming:
-        logger.info("Caméra non en cours d'utilisation, tentative de démarrage")
-        if not camera_streamer.initialize_camera():
-            logger.error("Échec de l'initialisation de la caméra")
-    logger.info(f"camera_streamer.is_streaming: {camera_streamer.is_streaming}")
+    
+    logger.info(f"camera_streamer.is_streaming: {camera_manager.isStreaming}")
     return jsonify({
-        'connected': camera_streamer.is_streaming,
+        'connected': camera_manager.isStreaming,
         'resolution': '1280x1280',
         'format': 'MJPEG',
-        'status': 'active' if camera_streamer.is_streaming else 'inactive'
+        'status': 'active' if camera_manager.isCameraRunning else 'inactive'
     })
 
 
@@ -200,5 +197,6 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"Erreur lors du démarrage: {e}")
     finally:
-        camera_streamer.stop_camera()
+        camera_manager.stop_camera()
+        cleanup()  # Nettoyage des GPIO
         logger.info("Serveur arrêté proprement")
