@@ -82,7 +82,7 @@ def generate_mjpeg(camera_manager: CameraManager):
         except Exception as e:
             logger.error(f"Erreur dans generate_mjpeg: {e}")
         finally:
-           camera_manager.stop_camera()
+           logger.info("Arrêt du flux MJPEG pour l'utilisateur dont IP est : " + request.remote_addr)
            stream_status = False  # Met à jour l'état du flux vidéo
            cv2.setNumThreads(0)  # Réinitialise les threads OpenCV
 
