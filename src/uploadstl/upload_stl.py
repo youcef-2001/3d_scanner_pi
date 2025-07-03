@@ -43,7 +43,7 @@ def authenticate_user():
         print(f"❌ Erreur d'authentification : {str(e)}")
         return False
 
-def save_file_metadata(unique_filename, original_filename, public_url):
+def save_file_metadata(user_folder_path, original_filename, public_url):
     """Sauvegarde les métadonnées du fichier dans votre table files existante"""
     try:
         # Récupérer l'utilisateur connecté
@@ -54,7 +54,7 @@ def save_file_metadata(unique_filename, original_filename, public_url):
             metadata = {
                 "user_id": user.user.id,
                 "filename": original_filename,  # Nom original du fichier
-                "path": public_url             # URL complète du fichier
+                "path": user_folder_path       # Chemin avec dossier utilisateur
                 # id et created_at sont gérés automatiquement par Supabase
             }
             
@@ -62,13 +62,14 @@ def save_file_metadata(unique_filename, original_filename, public_url):
             result = supabase.table('files').insert(metadata).execute()
             print(f"📝 Métadonnées sauvegardées dans la base de données")
             print(f"📋 Nom du fichier : {original_filename}")
-            print(f"🔗 Chemin sauvegardé : {public_url}")
+            print(f"🔗 Chemin sauvegardé : {user_folder_path}")
+            print(f"🌐 URL publique : {public_url}")
             
     except Exception as e:
         print(f"⚠️  Erreur lors de la sauvegarde des métadonnées : {str(e)}")
 
 def upload_stl_to_supabase(filepath):
-    """Upload un fichier STL vers Supabase Storage après authentification"""
+    """Upload un fichier STL vers Supabase Storage dans le dossier de l'utilisateur"""
     try:
         # Vérifier l'authentification avant l'upload
         if not authenticate_user():
@@ -79,33 +80,45 @@ def upload_stl_to_supabase(filepath):
             print(f"❌ Le fichier '{filepath}' n'existe pas.")
             return
             
+        # Récupérer l'utilisateur connecté pour créer son dossier
+        user = supabase.auth.get_user()
+        if not user.user:
+            print("❌ Impossible de récupérer les informations utilisateur")
+            return
+            
+        user_id = user.user.id
         filename = os.path.basename(filepath)
         filename = secure_filename(filename)
         
         # Générer un nom de fichier unique pour éviter les conflits
         unique_filename = f"{uuid.uuid4()}_{filename}"
         
+        # Créer le chemin avec le dossier utilisateur : user_id/nom_fichier
+        user_folder_path = f"{user_id}/{unique_filename}"
+        
         print(f"📤 Upload du fichier '{filename}' en cours...")
+        print(f"📁 Dossier utilisateur : {user_id}")
         
         # Lecture du fichier binaire
         with open(filepath, "rb") as f:
             file_data = f.read()
         
-        # Upload dans Supabase Storage
-        result = supabase.storage.from_(BUCKET_NAME).upload(unique_filename, file_data, {
+        # Upload dans Supabase Storage avec le chemin utilisateur
+        result = supabase.storage.from_(BUCKET_NAME).upload(user_folder_path, file_data, {
             "content-type": "model/stl"
         })
         
         if hasattr(result, 'error') and result.error:
             print(f"❌ Erreur lors de l'upload : {result.error}")
         else:
-            public_url = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET_NAME}/{unique_filename}"
+            public_url = f"{SUPABASE_URL}/storage/v1/object/public/{BUCKET_NAME}/{user_folder_path}"
             print(f"✅ Fichier '{filename}' uploadé avec succès !")
             print(f"🌐 URL publique : {public_url}")
             print(f"📋 Nom unique généré : {unique_filename}")
+            print(f"📁 Chemin complet : {user_folder_path}")
             
             # Sauvegarder dans votre table files existante
-            save_file_metadata(unique_filename, filename, public_url)
+            save_file_metadata(user_folder_path, filename, public_url)
             
     except Exception as e:
         print(f"❌ Exception : {str(e)}")
