@@ -132,32 +132,25 @@ import subprocess
 
 @app.route('/start-acquisition', methods=['POST'])
 def start_acquisition():
-        try :
-            Thread(target=Scan_3D).start()
-            return jsonify({
-                "status": "success",
-                "message": "Acquisition démarrée"
-            })
-        except Exception as e:
-            return jsonify({
-                "status": "error",
-                "message": str(e)
-            }), 500
-        
+    global is_acquisition_running
+    if is_acquisition_running:
+        return jsonify({"status": "error", "message": "Une acquisition est déjà en cours"}), 400
+    try:
+        is_acquisition_running = True
+        Thread(target=wrapped_scan).start()
+        return jsonify({"status": "success", "message": "Acquisition démarrée"})
+    except Exception as e:
+        is_acquisition_running = False
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/annuler-acquisition', methods=['POST'])
 def annuler_acquisition():
     try:
-        Thread(target=Stop_Scan).start()
-        return jsonify({
-            "status": "success",
-            "message": "Acquisition annulée"
-        })
+        Stop_Scan()
+        return jsonify({"status": "success", "message": "Acquisition annulée"})
     except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 def generate_mjpeg():
     picam2 = Picamera2()
