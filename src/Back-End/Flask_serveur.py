@@ -166,6 +166,16 @@ def video_feed():
         logger.error(f"Erreur dans video_feed: {e}")
         return jsonify({'error': 'Erreur du flux vidéo'}), 500
 
+@app.route('/camera/status')
+def camera_status():
+    """Route pour vérifier le statut de la caméra"""
+    logger.info(f"camera_streamer.is_streaming: {camera_streamer.is_streaming}")
+    return jsonify({
+        'connected': camera_streamer.is_streaming,
+        'resolution': '1280x1280',
+        'format': 'MJPEG',
+        'status': 'active' if camera_streamer.is_streaming else 'inactive'
+    })
 
 
 if __name__ == '__main__':
