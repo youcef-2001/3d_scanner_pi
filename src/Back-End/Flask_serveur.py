@@ -20,7 +20,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 camera_streamer = CameraStreamer(logger=logger)
-
+is_acquisition_running= False
 
 
 # ======================
@@ -146,8 +146,8 @@ def annuler_acquisition():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-
-@app.route('/camera/video_feed')
+# Get ou POst
+@app.route('/camera/video_feed', methods=['GET', 'POST'])
 def video_feed():
     """Route pour le flux vidéo MJPEG"""
     try:
@@ -165,37 +165,6 @@ def video_feed():
     except Exception as e:
         logger.error(f"Erreur dans video_feed: {e}")
         return jsonify({'error': 'Erreur du flux vidéo'}), 500
-
-@app.route('/camera/status')
-def camera_status():
-    """Route pour vérifier le statut de la caméra"""
-    logger.info(f"camera_streamer.is_streaming: {camera_streamer.is_streaming}")
-    return jsonify({
-        'connected': camera_streamer.is_streaming,
-        'resolution': '1280x1280',
-        'format': 'MJPEG',
-        'status': 'active' if camera_streamer.is_streaming else 'inactive'
-    })
-
-@app.route('/camera/start')
-def start_camera():
-    """Route pour démarrer la caméra"""
-    if camera_streamer.initialize_camera():
-        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-   
-        return jsonify({'success': True, 'message': 'Caméra démarrée'})
-    else:
-        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-   
-        return jsonify({'success': False, 'message': 'Erreur de démarrage'}), 500
-
-@app.route('/camera/stop')
-def stop_camera():
-    """Route pour arrêter la caméra"""
-    camera_streamer.stop_camera()
-    logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-    return jsonify({'success': True, 'message': 'Caméra arrêtée'})
-
 
 
 

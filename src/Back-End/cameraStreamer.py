@@ -55,8 +55,6 @@ class CameraStreamer:
 
     def generate_mjpeg(self):
         
-        # Stop si un ancien flux est resté bloqué
-        self.stop_camera()
         """Génère le flux MJPEG optimisé"""
         if not self.is_streaming:
             if not self.initialize_camera():
