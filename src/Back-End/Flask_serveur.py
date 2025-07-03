@@ -168,6 +168,6 @@ def video_feed():
 
 if __name__ == '__main__':
     try:
-        app.run(host='0.0.0.0', port=5000, threaded=True)
+        app.run(host='192.168.13.1', port=5000, threaded=True)
     finally:
         print("Server stopped.")
