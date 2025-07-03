@@ -223,7 +223,7 @@ def video_feed():
             logger.info("Caméra démarrée pour le flux vidéo")
         stream_status = True  # Indique que le flux est actif
         return Response( 
-                        generate_mjpeg(camera,stream_status) # Capture une image pour le flux
+                        generate_mjpeg(camera) # Capture une image pour le flux
             ,
             mimetype='multipart/x-mixed-replace; boundary=frame'
         )
