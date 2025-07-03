@@ -164,6 +164,7 @@ def video_feed():
             }
         )
     except Exception as e:
+        
         logger.error(f"Erreur dans video_feed: {e}")
         return jsonify({'error': 'Erreur du flux vidéo'}), 500
 
@@ -177,26 +178,6 @@ def camera_status():
         'format': 'MJPEG',
         'status': 'active' if camera_streamer.is_streaming else 'inactive'
     })
-
-@app.route('/camera/start')
-def start_camera():
-    """Route pour démarrer la caméra"""
-    if camera_streamer.initialize_camera():
-        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-   
-        return jsonify({'success': True, 'message': 'Caméra démarrée'})
-    else:
-        logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-   
-        return jsonify({'success': False, 'message': 'Erreur de démarrage'}), 500
-
-@app.route('/camera/stop')
-def stop_camera():
-    """Route pour arrêter la caméra"""
-    camera_streamer.stop_camera()
-    logger.info(f"camera streamer.is_streaming: {camera_streamer.is_streaming}")
-    return jsonify({'success': True, 'message': 'Caméra arrêtée'})
-
 
 
 

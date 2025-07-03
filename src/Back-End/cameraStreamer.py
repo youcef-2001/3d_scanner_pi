@@ -48,17 +48,22 @@ class CameraStreamer:
         with self.lock:
             if self.picam2 and self.is_streaming:
                 self.picam2.stop()
+                self.picam2.close()
+                self.picam2 = None
                 self.is_streaming = False
                 self.logger.info("Caméra arrêtée")
 
     def generate_mjpeg(self):
+        
+        # Stop si un ancien flux est resté bloqué
+        self.stop_camera()
         """Génère le flux MJPEG optimisé"""
         if not self.is_streaming:
             if not self.initialize_camera():
                 self.logger.error("Initialisation caméra échouée")
                 yield b''  # ou simplement "break" si plus clair
                 return
-            
+
         try:
             while self.is_streaming:
                 with self.lock:
