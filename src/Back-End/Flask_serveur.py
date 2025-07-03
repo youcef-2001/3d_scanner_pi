@@ -51,9 +51,10 @@ def generate_mjpeg(camera_manager: CameraManager):
                     
                     # Conversion RGB vers BGR pour OpenCV
                     frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                    
+                    # Rotation de 90 degrés (sens horaire)
+                    frame_bgr = cv2.rotate(frame_bgr, cv2.ROTATE_180)
                     # Encodage JPEG avec qualité optimisée
-                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 80]  # Qualité 80 ne pas charger le CPU
+                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 85]  # Qualité 80 ne pas charger le CPU
                     ret, jpeg = cv2.imencode('.jpg', frame_bgr, encode_param)
                     
                     if not ret:
@@ -75,7 +76,7 @@ def generate_mjpeg(camera_manager: CameraManager):
                            jpeg.tobytes() + b'\r\n')
                     
                     # Petit délai pour éviter la surcharge CPU
-                    time.sleep(0.033)  # ~30 FPS max
+                    time.sleep(0.020)  # ~ 50 FPS Max 
                     
         except GeneratorExit:
             logger.info("Client déconnecté du flux vidéo")
@@ -210,7 +211,7 @@ def start_acquisition():
     try:
         is_acquisition_running = True
         Thread(target=wrapped_scan).start()
-        return jsonify({"status": "success", "message": "Acquisition démarrée"})
+        return jsonify({"status": "success", "message": "Acquisition démarrée"}), 200
     except Exception as e:
         is_acquisition_running = False
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -219,7 +220,7 @@ def start_acquisition():
 def annuler_acquisition():
     try:
         Stop_Scan()
-        return jsonify({"status": "success", "message": "Acquisition annulée"})
+        return jsonify({"status": "success", "message": "Acquisition annulée"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -244,7 +245,7 @@ def video_feed():
                 'Expires': '0',
                 'Connection': 'keep-alive'
             }
-        )
+        ), 200
     except Exception as e:
         logger.error(f"Erreur lors du démarrage du flux vidéo: {e}")
         return "Erreur", 500
@@ -255,19 +256,23 @@ def camera_status():
     
     if not camera_manager.isCameraRunning:
         try:
-            config = {"main": {"size": (1280, 1280)}}
+            config = 'streaming'  # Configuration par défaut pour la caméra
             camera_manager.start_camera(config)
             logger.info("Caméra démarrée pour le statut")
         except Exception as e:
             logger.error(f"Erreur lors du démarrage de la caméra: {e}")
            
     logger.info(f"camera_streamer.is_streaming: {camera_manager.isCameraRunning}")
+    resolution = 'N/A'
+    if camera_manager.picam2:
+        w, h = camera_manager.picam2.camera_config["main"]["size"]
+        resolution = f'{w}X{h}'
     return jsonify({
         'connected': camera_manager.isCameraRunning,
-        'resolution': '1280x1280',
+        'resolution': resolution,
         'format': 'MJPEG',
         'status': 'active' if stream_status else 'inactive'
-    })
+    }), 200
 
 
 if __name__ == '__main__':
