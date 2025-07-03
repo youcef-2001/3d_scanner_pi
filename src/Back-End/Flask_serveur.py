@@ -215,6 +215,7 @@ def annuler_acquisition():
 # Get ou POst
 @app.route('/camera/video_feed')
 def video_feed():
+    global stream_status
     camera = CameraManager.get_instance(logger)
     try:
         if not camera.isCameraRunning:
