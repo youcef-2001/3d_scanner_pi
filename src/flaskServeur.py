@@ -39,6 +39,22 @@ scan_status = {
     "step": 0,  # Étape actuelle de l'acquisition
     "ackDone": False  # Indique si l'acquision est terminée
 }
+rgb_FILTRE = {
+        'redLow': 0,
+        'greenLow': 0,
+        'blueLow': 0,
+        'redHigh': 255,
+        'greenHigh': 255,
+        'blueHigh': 255
+    }
+hsv_FILTRE = {
+        'hueLow': 0,
+        'saturationLow': 0,
+        'valueLow': 0,
+        'hueHigh': 255,
+        'saturationHigh': 255,
+        'valueHigh': 255
+    }
 #=======================
 #Live streaming
 #========================
@@ -53,6 +69,7 @@ def generate_mjpeg(camera_manager: CameraManager):
             frame_count = 0
             last_frame_time = time.time()
             logger.info("Démarrage du flux MJPEG")
+            cv2.setNumThreads(1)  # Désactive le multithreading pour éviter les conflits avec Picamera2
             # Boucle de capture d'images
             while stream_status:
                     if not camera_manager.isCameraRunning:
@@ -62,8 +79,11 @@ def generate_mjpeg(camera_manager: CameraManager):
                         break
                     # Capture de l'image
                     frame = camera_manager.capture_array()
-                    res=apply_filter(frame, 'HSV', *HSV_FILTRE)
-                    fres=apply_filter(res, 'RGB', *RGB_FILTRE)
+                    # hsv FILTRE et rgb filtre sont des dico je veux les convertir en tuple
+                    hsv = tuple(hsv_FILTRE.values())
+                    rgb = tuple(rgb_FILTRE.values())
+                    res=apply_filter(frame, 'HSV', *hsv)
+                    fres=apply_filter(res, 'RGB', *rgb)
                     # Conversion RGB vers BGR pour OpenCV
                     frame_bgr = cv2.cvtColor(fres, cv2.COLOR_RGB2BGR)
                     
@@ -335,13 +355,37 @@ def camera_status():
 def update_rgb_filter():
     data = request.get_json()
     
-    # Récupérer les paramètres
-    red = data.get('red', 1.0)
-    green = data.get('green', 1.0)
-    blue = data.get('blue', 1.0)
-    brightness = data.get('brightness', 1.0)
-    contrast = data.get('contrast', 1.0)
-    saturation = data.get('saturation', 1.0)
+    ''' // RGB Low
+          'redLow': redLow,
+          'greenLow': greenLow,
+          'blueLow': blueLow,
+          // HSV Low
+          'hueLow': hueLow,
+          'saturationLow': saturationLow,
+          'valueLow': valueLow,
+          // RGB High
+          'redHigh': redHigh,
+          'greenHigh': greenHigh,
+          'blueHigh': blueHigh,
+          // HSV High
+          'hueHigh': hueHigh,
+          'saturationHigh': saturationHigh,
+          'valueHigh': valueHigh,'''
+    
+    rgb_FILTRE ['redLow'] = data.get('redLow')
+    rgb_FILTRE ['greenLow'] = data.get('greenLow')
+    rgb_FILTRE ['blueLow'] = data.get('blueLow')
+    rgb_FILTRE ['redHigh'] = data.get('redHigh')
+    rgb_FILTRE ['greenHigh'] = data.get('greenHigh')
+    rgb_FILTRE ['blueHigh'] = data.get('blueHigh')
+    hsv_FILTRE ['hueLow'] = data.get('hueLow')
+    hsv_FILTRE ['saturationLow'] = data.get('saturationLow')
+    hsv_FILTRE ['valueLow'] = data.get('valueLow')
+    hsv_FILTRE ['hueHigh'] = data.get('hueHigh')
+    hsv_FILTRE ['saturationHigh'] = data.get('saturationHigh')
+    hsv_FILTRE ['valueHigh'] = data.get('valueHigh')
+    logger.info(f"Filtres RGB mis à jour: {rgb_FILTRE}")
+    
     
     # Appliquer les filtres à votre flux caméra
     # Exemple avec OpenCV :
