@@ -4,8 +4,8 @@ import logging
 import getpass
 from datetime import datetime
 
-from TfLunaI2C import TfLunaI2C
-from laserService import setup, turn_on_laser, turn_off_laser, cleanup
+from services.TfLunaI2C import TfLunaI2C
+from services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
 from services.cameraManager import CameraManager
 
 username = getpass.getuser()
