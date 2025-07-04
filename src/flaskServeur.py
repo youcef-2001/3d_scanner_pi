@@ -207,6 +207,7 @@ def laser_on():
 @app.route('/laser/off', methods=['POST'])
 def laser_off():
     try:
+        setup()
         turn_off_laser()
         cleanup()
         return jsonify({"status": "success", "message": "Laser éteint et GPIO nettoyé"})
