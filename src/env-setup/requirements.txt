@@ -20,9 +20,5 @@ pylint
 numpy<2
 supabase
 dotenv
-glob
-getpass
-threading
 jwt
-logging
 
