@@ -5,7 +5,7 @@ import numpy as np
 import logging
 
 
-def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,logger=logging.getLogger(__name__)):
+def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,fps_on_acqu=15,logger=logging.getLogger(__name__)):
     """    Fonction pour construire un nuage de points 3D à partir d'images
     """
     # === Chemin du dossier contenant les images ===
@@ -38,7 +38,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
         image_path = image_files[i]
         # Calculer le degré de rotation pour chaque image
         # Supposons 234 images pour une rotation complète de 360°
-        degree = (i * 360) / 224# 223 images etablie lors des test =/= 234 images
+        degree = (i * 360) / int(fps_on_acqu * 13.7)
         # === Lire l'image ===
         frame = cv2.imread(image_path)
         frame = cv2.rotate(frame, cv2.ROTATE_180)
@@ -77,6 +77,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
                 xyz_file.write(f"{coord[0]} {coord[1]} {coord[2]}\n")
                 
     logger.info(f"✅ Fichier XYZ créé avec succès : {exportFileAbsolutePath}")
+    
 
         
         

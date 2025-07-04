@@ -47,16 +47,15 @@ def authenticate_user():
         print(f"❌ Erreur d'authentification : {str(e)}")
         return False
 
-def save_file_metadata(user_folder_path, original_filename, public_url):
+def save_file_metadata(user_folder_path, original_filename, public_url,userid):
     """Sauvegarde les métadonnées du fichier dans votre table files existante"""
     try:
-        # Récupérer l'utilisateur connecté
-        user = supabase.auth.get_user()
         
-        if user.user:
+        
+        if userid:
             # Adapter aux colonnes de votre table : id, user_id, filename, path, created_at
             metadata = {
-                "user_id": user.user.id,
+                "user_id": userid,
                 "filename": original_filename,  # Nom original du fichier
                 "path": user_folder_path       # Chemin avec dossier utilisateur
                 # id et created_at sont gérés automatiquement par Supabase
@@ -72,25 +71,11 @@ def save_file_metadata(user_folder_path, original_filename, public_url):
     except Exception as e:
         print(f"⚠️  Erreur lors de la sauvegarde des métadonnées : {str(e)}")
 
-def upload_stl_to_supabase(filepath):
+def upload_stl_to_supabase(filepath,userid):
     """Upload un fichier STL vers Supabase Storage dans le dossier de l'utilisateur"""
     try:
-        # Vérifier l'authentification avant l'upload
-        if not authenticate_user():
-            print("❌ Impossible de continuer sans authentification")
-            return
-        
-        if not os.path.exists(filepath):
-            print(f"❌ Le fichier '{filepath}' n'existe pas.")
-            return
-            
-        # Récupérer l'utilisateur connecté pour créer son dossier
-        user = supabase.auth.get_user()
-        if not user.user:
-            print("❌ Impossible de récupérer les informations utilisateur")
-            return
-            
-        user_id = user.user.id
+       
+        user_id = userid
         filename = os.path.basename(filepath)
         filename = secure_filename(filename)
         
@@ -122,7 +107,7 @@ def upload_stl_to_supabase(filepath):
             print(f"📁 Chemin complet : {user_folder_path}")
             
             # Sauvegarder dans votre table files existante
-            save_file_metadata(user_folder_path, filename, public_url)
+            save_file_metadata(user_folder_path, filename, public_url,userid)
             
     except Exception as e:
         print(f"❌ Exception : {str(e)}")
@@ -135,9 +120,3 @@ def logout_user():
     except Exception as e:
         print(f"❌ Erreur lors de la déconnexion : {str(e)}")
 
-if __name__ == "__main__":
-    print("=== UPLOAD STL AVEC AUTHENTIFICATION ===")
-    upload_stl_to_supabase(LOCAL_FILE_PATH)
-    
-    # Optionnel : Se déconnecter après l'upload
-    logout_user()

@@ -7,7 +7,7 @@ from datetime import datetime
 from services.TfLunaI2C import TfLunaI2C
 from services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
 from services.cameraManager import CameraManager
-
+TIME= 30  # Durée de la numérisation en secondes
 username = getpass.getuser()
 isScanning = False
 scan_number = 0# serial number to identify the scan
@@ -26,6 +26,7 @@ def Scan_3D(logger=logging.getLogger(__name__)):
     isScanning = True
     save_dir = ''
     csv_file = ''
+    image_number = 0
     try:
         setup()
         tf = TfLunaI2C()
@@ -41,20 +42,20 @@ def Scan_3D(logger=logging.getLogger(__name__)):
         config = {"main":{"size": (1280, 1280)}}
         picammanager.start_camera(config)
         time.sleep(0.5)
-        i = 0
+        
         temps_Deb = time.time()
         turn_on_laser()
         logger.info("🔴 Laser allumé !")
         tfluna_acqu = []
 
-        while isScanning and time.time() - temps_Deb < 30:
-            filename = os.path.join(save_dir, f"img_{i:05d}.jpeg")
+        while isScanning and time.time() - temps_Deb < TIME:
+            filename = os.path.join(save_dir, f"img_{image_number:05d}.jpeg")
             picammanager.capture_file(filename)
             distance, amplitude, temperature, ticks, error = tf.read_data()
             tfluna_acqu.append((distance, amplitude, temperature, ticks, error))
             logger.info(f"📷 Image {i:05d} capturée - Distance : {distance} cm")
             logger.info(f"⏱ Temps écoulé : {time.time() - temps_Deb:.2f} s")
-            i += 1
+            image_number += 1
 
         logger.info("✅ Fin de capture.")
 
@@ -74,7 +75,7 @@ def Scan_3D(logger=logging.getLogger(__name__)):
         logger.info("✅ Nettoyage terminé.")
         isScanning = False
         logger.info(f"📁 Images sauvegardées dans : {save_dir}")
-        return save_dir,csv_file
+        return save_dir,csv_file,image_number/TIME  # Retourne le répertoire de sauvegarde, le fichier CSV et le nombre d'images capturées par seconde FPS
 
 if __name__ == "__main__":
     print("🔍 Démarrage de la numérisation 3D...")
