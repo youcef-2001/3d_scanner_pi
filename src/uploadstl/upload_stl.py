@@ -25,7 +25,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # === CHEMIN VERS TON FICHIER STL LOCAL ===
 LOCAL_FILE_PATH = "fichier_a_envoyer.stl"
 
-def save_file_metadata(user_folder_path, original_filename, public_url,userid,token):
+def save_file_metadata(user_folder_path, original_filename, public_url,userid):
     """Sauvegarde les métadonnées du fichier dans votre table files existante"""
     try:
         
@@ -95,7 +95,7 @@ def upload_stl_to_supabase(filepath,userid,token):
             print(f"📁 Chemin complet : {user_folder_path}")
             
             # Sauvegarder dans votre table files existante
-            save_file_metadata(user_folder_path, filename, public_url,userid,token)
+            save_file_metadata(user_folder_path, filename, public_url,userid)
             
     except Exception as e:
         print(f"❌ Exception : {str(e)}")
