@@ -3,8 +3,7 @@
 RPi.GPIO
 #camera
 picamera2
-opencv-python
-opencv
+opencv_python
 # server backend 
 flask
 open3d
