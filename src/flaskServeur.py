@@ -16,7 +16,7 @@ from services.cameraManager import CameraManager
 from services.TfLunaI2C import TfLunaI2C
 from services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
 from services.acquisition import Stop_Scan
-from run_full_pipeline import workflow as Scan_3D
+from run_full_pipeline import workflow 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
 
@@ -220,7 +220,7 @@ def wrapped_scan(uid,):
     scan_status["step"] = 0  # Étape d'acquisition initiale
     scan_status["ackDone"] = False  # Acquisition non terminée
     try:
-        Scan_3D(uid,scan_status=scan_status)  # Démarrer l'acquisition 3D
+        workflow(uid,scan_status=scan_status)  # Démarrer l'acquisition 3D
         scan_status["ackDone"] = True  # Acquisition terminée
     finally:
         scan_status["status"] = False  # Acquisition terminée
@@ -230,9 +230,6 @@ def wrapped_scan(uid,):
 @app.route('/start-acquisition/', methods=['POST'])
 def start_acquisition():
     """Démarre une acquisition 3D en arrière-plan"""
-    
-    
-    
     if scan_status["status"]:
         return jsonify({"status": "error", "message": "Une acquisition est déjà en cours"}), 403
     try:
@@ -244,6 +241,9 @@ def start_acquisition():
         # Décodage du JWT sans vérification de signature (juste pour extraction)
         payload = jwt.decode(token, options={"verify_signature": False})
         user_id = payload.get("sub")
+        # get distance from body request
+        data = request.get_json()
+        distance = data.get("distance")
         if not user_id:
             return jsonify({"status": "error", "message": "ID utilisateur manquant"}), 400
         
@@ -260,6 +260,7 @@ def start_acquisition():
 @app.route('/acquisition-status', methods=['GET'])
 def acquisition_status():
     """Vérifie si une acquisition est en cours"""
+    value = False  # Valeur par défaut pour ackDone
     if scan_status["ackDone"]:
         value = True#Envoie acknowledge pour le client une seule fois 
         scan_status["ackDone"] = False  # Réinitialiser l'état d'acquision
