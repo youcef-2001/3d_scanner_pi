@@ -7,7 +7,6 @@ opencv_python
 # server backend 
 flask
 open3d
-cv2
 #tf luna dep
 smbus
 pylint
