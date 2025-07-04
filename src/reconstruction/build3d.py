@@ -1,11 +1,11 @@
-from reconstruction.utils import apply_filter, get_camera_coordinates, camerapoint_to_centerpoint, IMAGE_FOLDER, HSV_FILTRE, RGB_FILTRE
+from reconstruction.utils import apply_filter, get_camera_coordinates, camerapoint_to_centerpoint, IMAGE_FOLDER, HSV_FILTRE, RGB_FILTRE, DISTANCE_CAMERA_ROTATION_CENTER
 import os
 import cv2
 import numpy as np
 import logging
 
 
-def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,fps_on_acqu=15,logger=logging.getLogger(__name__)):
+def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,fps_on_acqu=15,distance =DISTANCE_CAMERA_ROTATION_CENTER ,logger=logging.getLogger(__name__)):
     """    Fonction pour construire un nuage de points 3D à partir d'images
     """
     # === Chemin du dossier contenant les images ===

@@ -5,7 +5,7 @@ from uploadstl.upload_stl import upload_stl_to_supabase
 import os
 import logging
 
-def workflow(user_ID,scan_status):
+def workflow(user_ID,distance,scan_status):
     
     logger = logging.getLogger(__name__)
     # 1. Acquisition & Build : génère 3d_object.xyz et 3d_object.stl bruts
@@ -26,12 +26,13 @@ def workflow(user_ID,scan_status):
     hsv_filter= HSV_FILTRE
     scan_status['step'] += 1  # Increment step for tracking progress
     Build_3D_Cloud(AcquDirectory, absolute_path_export_file, 
-                   rgb_filter=rgb_filter, hsv_filter=hsv_filter,fps_on_acqu=fps, logger=logger)
+                   rgb_filter=rgb_filter, hsv_filter=hsv_filter,fps_on_acqu=fps,
+                   distance =distance , logger=logger)
 
     # 3. Upload vers Supabase
     scan_status['step'] += 1  # Increment step for tracking progress
     if True and os.path.exists(absolute_path_export_file):
-        upload_stl_to_supabase(absolute_path_export_file,userid=user_ID)
+        upload_stl_to_supabase(absolute_path_export_file,userid=user_ID,token=token)
         
     scan_status['step'] += 1  # Increment step for tracking progress
 

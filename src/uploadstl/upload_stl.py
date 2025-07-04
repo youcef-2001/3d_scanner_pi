@@ -1,5 +1,6 @@
 import os
 import uuid
+import requests
 from supabase import create_client, Client
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -47,7 +48,7 @@ def authenticate_user():
         print(f"❌ Erreur d'authentification : {str(e)}")
         return False
 
-def save_file_metadata(user_folder_path, original_filename, public_url,userid):
+def save_file_metadata(user_folder_path, original_filename, public_url,userid,token):
     """Sauvegarde les métadonnées du fichier dans votre table files existante"""
     try:
         
@@ -62,7 +63,7 @@ def save_file_metadata(user_folder_path, original_filename, public_url,userid):
             }
             
             # Insérer dans votre table 'files' existante
-            result = supabase.table('files').insert(metadata).execute()
+            result = insert_file_metadata(token, metadata)
             print(f"📝 Métadonnées sauvegardées dans la base de données")
             print(f"📋 Nom du fichier : {original_filename}")
             print(f"🔗 Chemin sauvegardé : {user_folder_path}")
@@ -70,8 +71,18 @@ def save_file_metadata(user_folder_path, original_filename, public_url,userid):
             
     except Exception as e:
         print(f"⚠️  Erreur lors de la sauvegarde des métadonnées : {str(e)}")
+        
+def insert_file_metadata(token: str, metadata: dict):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+    }
+    url = "https://<ton-projet>.supabase.co/rest/v1/files"
+    response = requests.post(url, json=metadata, headers=headers)
+    return response
 
-def upload_stl_to_supabase(filepath,userid):
+def upload_stl_to_supabase(filepath,userid,token):
     """Upload un fichier STL vers Supabase Storage dans le dossier de l'utilisateur"""
     try:
        
@@ -107,7 +118,7 @@ def upload_stl_to_supabase(filepath,userid):
             print(f"📁 Chemin complet : {user_folder_path}")
             
             # Sauvegarder dans votre table files existante
-            save_file_metadata(user_folder_path, filename, public_url,userid)
+            save_file_metadata(user_folder_path, filename, public_url,userid,token)
             
     except Exception as e:
         print(f"❌ Exception : {str(e)}")
