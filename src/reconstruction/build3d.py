@@ -33,7 +33,6 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
     # ayant 15.2 FPS
     # donc 13.6 secondes * 15.2 FPS =  207.2 images
     # donc 234 images pour une rotation de 360°'''
-    cv2.setNumThreads(3)  # mettre au max de thread d'un raspberry pi 3 -(minus) le thread Flask
     while  i < len(image_files):
         image_path = image_files[i]
         # Calculer le degré de rotation pour chaque image
@@ -65,7 +64,6 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
                         x,y,z= camerapoint_to_centerpoint(camera_coords,x,y,width, height,degree)
                         coords_per_pixel.append((x, y, z))
             coords_per_image.append(coords_per_pixel)
-        cv2.setNumThreads(1)  # Réinitialiser le nombre de threads pour éviter les problèmes de performance  
         i += 1
         
     #Rotation Totale , translation totale

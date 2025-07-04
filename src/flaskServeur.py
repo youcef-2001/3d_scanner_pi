@@ -48,7 +48,6 @@ def generate_mjpeg(camera_manager: CameraManager):
         if not camera_manager.isCameraRunning:
             if not camera_manager.picam2:
                 return
-        cv2.setNumThreads(2)  # Désactive les threads OpenCV pour éviter la surcharge CPU
         try:
             # Initialisation des variables de performance
             frame_count = 0
@@ -103,7 +102,6 @@ def generate_mjpeg(camera_manager: CameraManager):
         finally:
            logger.info("Arrêt du flux MJPEG  " )
            stream_status = False  # Met à jour l'état du flux vidéo
-           cv2.setNumThreads(0)  # Réinitialise les threads OpenCV
 
 
 

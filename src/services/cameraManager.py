@@ -27,9 +27,9 @@ class CameraManager:
                 try:
                     self.picam2 = Picamera2()
                     if config == 'default':
-                        config = self.picam2.create_still_configuration(main={"size": (1280, 1280)}, buffer_count=10)
+                        config = self.picam2.create_still_configuration(main={"size": (1280, 1280)}, buffer_count=8)
                     elif config == 'streaming':
-                        config = self.picam2.create_video_configuration(main={"size": (800, 800)}, buffer_count=10)
+                        config = self.picam2.create_video_configuration(main={"size": (640, 480)}, buffer_count=8)
                     elif isinstance(config, dict):
                         config = self.picam2.create_still_configuration(**config)
                     self.picam2.configure(config)
@@ -74,6 +74,7 @@ class CameraManager:
             except Exception as e:
                 self.logger.error(f"Erreur de capture de fichier: {e}")
                 return False
+            
     def capture_array(self):
         with self.lock:
             if not self.isCameraRunning:
