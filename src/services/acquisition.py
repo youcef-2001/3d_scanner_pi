@@ -53,7 +53,7 @@ def Scan_3D(logger=logging.getLogger(__name__)):
             picammanager.capture_file(filename)
             distance, amplitude, temperature, ticks, error = tf.read_data()
             tfluna_acqu.append((distance, amplitude, temperature, ticks, error))
-            logger.info(f"📷 Image {i:05d} capturée - Distance : {distance} cm")
+            logger.info(f"📷 Image {image_number:05d} capturée - Distance : {distance} cm")
             logger.info(f"⏱ Temps écoulé : {time.time() - temps_Deb:.2f} s")
             image_number += 1
 
