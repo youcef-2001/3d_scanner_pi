@@ -212,13 +212,13 @@ def read_tfluna():
 
 #start_acquisition
 
-def wrapped_scan(uid,distance):
+def wrapped_scan(uid,distance,token):
     """Fonction d'acquisition 3D en arrière-plan"""
     scan_status["status"] = True  # Acquisition en cours
     scan_status["step"] = 0  # Étape d'acquisition initiale
     scan_status["ackDone"] = False  # Acquisition non terminée
     try:
-        workflow(uid,distance,scan_status=scan_status)  # Démarrer l'acquisition 3D
+        workflow(uid,distance,scan_status=scan_status,token=token)  # Démarrer l'acquisition 3D
         scan_status["ackDone"] = True  # Acquisition terminée
     finally:
         scan_status["status"] = False  # Acquisition terminée
@@ -245,7 +245,7 @@ def start_acquisition():
         if not user_id:
             return jsonify({"status": "error", "message": "ID utilisateur manquant"}), 400
         
-        Thread(target=wrapped_scan, args=(user_id,distance,), daemon=True).start()
+        Thread(target=wrapped_scan, args=(user_id,distance,token,), daemon=True).start()
         return jsonify({"status": "success", "message": "Acquisition démarrée"}), 200
     
     except Exception as e:

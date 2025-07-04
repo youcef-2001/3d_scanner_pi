@@ -5,7 +5,7 @@ from uploadstl.upload_stl import upload_stl_to_supabase
 import os
 import logging
 
-def workflow(user_ID,distance,scan_status):
+def workflow(user_ID,distance,scan_status, token):
     
     logger = logging.getLogger(__name__)
     # 1. Acquisition & Build : génère 3d_object.xyz et 3d_object.stl bruts
