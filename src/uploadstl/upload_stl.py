@@ -31,7 +31,7 @@ def authenticate_user(token):
         print("🔐 Authentification en cours...")
         #Connexion avec id_token
         credentials = {
-            "provider": 'supabase',
+            "provider": 'email',
             "token": token
         }
         response = supabase.auth.sign_in_with_id_token(credentials)
