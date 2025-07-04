@@ -4,7 +4,7 @@ import logging
 import getpass
 from datetime import datetime
 
-from CameraManager import CameraManager
+from cameraManager import CameraManager
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 
