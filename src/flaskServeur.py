@@ -59,10 +59,10 @@ def generate_mjpeg(camera_manager: CameraManager):
                         break
                     # Capture de l'image
                     frame = camera_manager.capture_array()
-                    apply_filter(frame, 'HSV', *HSV_FILTRE)
-                    apply_filter(frame, 'RGB', *RGB_FILTRE)
+                    res=apply_filter(frame, 'HSV', *HSV_FILTRE)
+                    fres=apply_filter(res, 'RGB', *RGB_FILTRE)
                     # Conversion RGB vers BGR pour OpenCV
-                    frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    frame_bgr = cv2.cvtColor(fres, cv2.COLOR_RGB2BGR)
                     
                     # Rotation de 90 degrés (sens horaire)
                     frame_bgr = cv2.rotate(frame_bgr, cv2.ROTATE_180)
