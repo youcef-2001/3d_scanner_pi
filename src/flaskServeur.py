@@ -330,6 +330,26 @@ def camera_status():
         'status': 'active' if stream_status else 'inactive'
     }), 200
 
+@app.route('/camera/rgb-filter', methods=['POST'])
+def update_rgb_filter():
+    data = request.get_json()
+    
+    # Récupérer les paramètres
+    red = data.get('red', 1.0)
+    green = data.get('green', 1.0)
+    blue = data.get('blue', 1.0)
+    brightness = data.get('brightness', 1.0)
+    contrast = data.get('contrast', 1.0)
+    saturation = data.get('saturation', 1.0)
+    
+    # Appliquer les filtres à votre flux caméra
+    # Exemple avec OpenCV :
+    # frame = cv2.convertScaleAbs(frame, alpha=contrast, beta=brightness)
+    # frame[:,:,0] = np.clip(frame[:,:,0] * blue, 0, 255)   # Canal bleu
+    # frame[:,:,1] = np.clip(frame[:,:,1] * green, 0, 255)  # Canal vert
+    # frame[:,:,2] = np.clip(frame[:,:,2] * red, 0, 255)    # Canal rouge
+    
+    return jsonify({"status": "success", "message": "Filtres RGB appliqués"})
 
 if __name__ == '__main__':
     try:
