@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 import getpass
 import os
-from TfLunaI2C import TfLunaI2C
+from tfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time
 
