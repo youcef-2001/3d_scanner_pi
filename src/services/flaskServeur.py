@@ -9,7 +9,7 @@ from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
 from acquisition import  Stop_Scan 
-from ...src.run_full_pipeline import workflow as Scan_3D
+from src.run_full_pipeline import workflow as Scan_3D
 from supabase import create_client, Client
 import logging
 import cv2
