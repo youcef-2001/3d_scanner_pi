@@ -10,9 +10,9 @@ apt install -y libi2c-dev i2c-tools libcamera-apps libcamera-dev libi2c0 libcap-
 # Installer les dépendances Python 
 apt install -y python3 python3-pip python3-venv
 cd ../
-# Créer un environnement virtuel Python
-python3 -m venv venv
-# Activer l'environnement virtuel
+# Créer un environnement virtuel Python utilisant les libraries system 
+python3 -m venv venv --system-site-packages
+# Activer l'environnement virtuel 
 source venv/bin/activate
 # Installer les dépendances Python
 pip install -r ./env-setup/requirements.txt

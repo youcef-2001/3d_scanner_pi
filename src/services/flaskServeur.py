@@ -1,10 +1,10 @@
 from threading import Thread
 from flask import Flask, jsonify, Response, request
 from cameraManager import CameraManager
-from TfLunaI2C import TfLunaI2C
+from tfLuna import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
-from services.acquisition import Scan_3D, Stop_Scan 
+from acquisition import Scan_3D, Stop_Scan 
 from supabase import create_client, Client
 import logging
 import cv2
