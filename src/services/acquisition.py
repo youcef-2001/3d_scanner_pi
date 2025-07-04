@@ -1,4 +1,4 @@
-from cameraManager import CameraManager
+from CameraManager import CameraManager
 from picamera2.utils import Transform
 import logging
 from datetime import datetime
