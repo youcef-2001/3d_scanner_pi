@@ -239,7 +239,7 @@ def wrapped_scan(uid,distance,token):
     scan_status["step"] = 0  # Étape d'acquisition initiale
     scan_status["ackDone"] = False  # Acquisition non terminée
     try:
-        workflow(uid,distance,scan_status=scan_status,token=token)  # Démarrer l'acquisition 3D
+        workflow(uid,distance,scan_status=scan_status,token=token,  rgb_filter=rgb_FILTRE,hsv_filter=hsv_FILTRE)
         scan_status["ackDone"] = True  # Acquisition terminée
     finally:
         scan_status["status"] = False  # Acquisition terminée

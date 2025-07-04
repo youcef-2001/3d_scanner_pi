@@ -37,7 +37,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
         image_path = image_files[i]
         # Calculer le degré de rotation pour chaque image
         # Supposons 234 images pour une rotation complète de 360°
-        degree = (i * 360) / int(fps_on_acqu * 13.7)
+        degree = (i * 360) / int(fps_on_acqu * 14.3)
         # === Lire l'image ===
         frame = cv2.imread(image_path)
         frame = cv2.rotate(frame, cv2.ROTATE_180)
