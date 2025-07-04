@@ -11,11 +11,11 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, Response, request
 from supabase import create_client, Client
 
-from src.services.cameraManager import CameraManager
-from src.services.TfLunaI2C import TfLunaI2C
-from src.services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
-from src.services.acquisition import Stop_Scan
-from src.run_full_pipeline import workflow as Scan_3D
+from services.cameraManager import CameraManager
+from services.TfLunaI2C import TfLunaI2C
+from services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
+from services.acquisition import Stop_Scan
+from run_full_pipeline import workflow as Scan_3D
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
 

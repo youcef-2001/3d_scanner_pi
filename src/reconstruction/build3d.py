@@ -84,6 +84,9 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
 if __name__ == "__main__":
     # === Chemin du dossier contenant les images ===
     EXPORT_FILE_NAME = "3d_object.xyz"
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    
     
     # === Vérifier si le dossier existe ===
     if not os.path.exists(IMAGE_FOLDER):
@@ -91,4 +94,4 @@ if __name__ == "__main__":
         exit(1)
     
     # === Construire le nuage de points 3D ===
-    Build_3D_Cloud(IMAGE_FOLDER, EXPORT_FILE_NAME)
+    Build_3D_Cloud(IMAGE_FOLDER, EXPORT_FILE_NAME,logger = logger)

@@ -4,19 +4,19 @@ import math
 
 
 # === Dossier des images ===
-IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/archive/acquisition_01_07_20_30'
+IMAGE_FOLDER = '/Users/youcefbaleh/Desktop/IoT/tmp/mardi/archive/acquisition_01_07_20_42'
 DISTANCE_CAMERA_LASER = 0.073# in m
 INITIAL_CAMERA_DEGREE = 90
 INITIAL_LASER_DEGREE = 78.5
 HORIZONTAL_FOV = 54 # in degree, horizontal field of view of the camera
 VERTICAL_FOV = 41 # in degree, vertical field of view of the camera
-HSV_FILTRE= (0, 0, 180, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
-RGB_FILTRE = (150, 150, 150, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+HSV_FILTRE= (118, 0, 244, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
+RGB_FILTRE = (9, 0, 99, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 0.0036 # in m, focal length of the camera
 PIXEL_SIZE=1.4e-6 # in m, size of a pixel in the camera sensor
-DISTANCE_CAMERA_ROTATION_CENTER = 0.356 # in m, distance between the camera and the rotation center of the platform
-DEGREE_CAMERA_ROTATION_AXES = 0 # in degree, the camera rotates around the Y axis of the platform
-HEIGHT_CAMERA_ROTATION_CENTER = 0 # in m, height of the camera from the rotation center of the platform
+DISTANCE_CAMERA_ROTATION_CENTER = 0.17 # in m, distance between the camera and the rotation center of the platform
+DEGREE_CAMERA_ROTATION_AXES = 60 # in degree, the camera rotates around the Y axis of the platform
+HEIGHT_CAMERA_ROTATION_CENTER = 0.13 # in m, height of the camera from the rotation center of the platform
 
 
 # === Appliquer le filtre  HSV ou RGB ===
