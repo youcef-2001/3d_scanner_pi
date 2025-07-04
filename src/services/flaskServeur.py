@@ -1,6 +1,10 @@
 from threading import Thread
 from flask import Flask, jsonify, Response, request
 from cameraManager import CameraManager
+import os 
+import sys
+# Ajouter le chemin du répertoire parent pour accéder à CameraManager
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from tfLuna import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
