@@ -25,42 +25,12 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # === CHEMIN VERS TON FICHIER STL LOCAL ===
 LOCAL_FILE_PATH = "fichier_a_envoyer.stl"
 
-def authenticate_user(token):
-    """Authentifie l'utilisateur avec Supabase Auth"""
-    try:
-        print("🔐 Authentification en cours...")
-        #Connexion avec id_token
-        credentials = {
-            "provider": 'email',
-            "token": token
-        }
-        response = supabase.auth.sign_in_with_id_token(credentials)
-        
-        if response.user:
-            print(f"✅ Authentification réussie ")
-            print(f"👤 Utilisateur ID: {response.user.id}")
-            return response
-        else:
-            print("❌ Échec de l'authentification")
-            return None
-            
-    except Exception as e:
-        print(f"❌ Erreur d'authentification : {str(e)}")
-        return None
-
 def save_file_metadata(user_folder_path, original_filename, public_url,userid,token):
     """Sauvegarde les métadonnées du fichier dans votre table files existante"""
     try:
-        auth = authenticate_user(token)
-        if not auth :
-            print("❌ Authentification échouée, impossible de sauvegarder les métadonnées")
-            return
-        user_token = auth.session.access_token
-        user_id = auth.user.id
-
-        # 👇 Nouveau client authentifié avec le token de l'utilisateur
-        user_client = create_client(SUPABASE_URL, user_token)
-        if userid==user_id:
+        
+        
+        if userid:
             # Adapter aux colonnes de votre table : id, user_id, filename, path, created_at
             metadata = {
                 "user_id": userid,
@@ -68,11 +38,9 @@ def save_file_metadata(user_folder_path, original_filename, public_url,userid,to
                 "path": user_folder_path       # Chemin avec dossier utilisateur
                 # id et created_at sont gérés automatiquement par Supabase
             }
-            #inserer le token dans la ssession
-              
             
             # Insérer dans votre table 'files' existante
-            result = user_client.table('files').insert(metadata).execute()
+            result = supabase.table('files').insert(metadata).execute()
             print(f"📝 Métadonnées sauvegardées dans la base de données")
             print(f"📋 Nom du fichier : {original_filename}")
             print(f"🔗 Chemin sauvegardé : {user_folder_path}")
@@ -81,6 +49,15 @@ def save_file_metadata(user_folder_path, original_filename, public_url,userid,to
     except Exception as e:
         print(f"⚠️  Erreur lors de la sauvegarde des métadonnées : {str(e)}")
         
+def insert_file_metadata(token: str, metadata: dict):
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+    }
+    url = "https://<ton-projet>.supabase.co/rest/v1/files"
+    response = requests.post(url, json=metadata, headers=headers)
+    return response
 
 def upload_stl_to_supabase(filepath,userid,token):
     """Upload un fichier STL vers Supabase Storage dans le dossier de l'utilisateur"""
