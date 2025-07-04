@@ -1,12 +1,12 @@
-from CameraManager import CameraManager
-from picamera2.utils import Transform
-import logging
-from datetime import datetime
-import getpass
 import os
+import time
+import logging
+import getpass
+from datetime import datetime
+
+from CameraManager import CameraManager
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
-import time
 
 username = getpass.getuser()
 isScanning = False
