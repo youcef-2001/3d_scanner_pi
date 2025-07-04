@@ -227,7 +227,7 @@ def wrapped_scan(uid,):
         scan_status["step"] = 0  # Réinitialiser l'étape d'acquisition
         logger.info("Acquisition 3D terminée")
 # route post pour demarrer une aquisition qui necessite de recevoir un parametre user_id
-@app.route('/start-acquisition/', methods=['POST'])
+@app.route('/start-acquisition', methods=['POST'])
 def start_acquisition():
     """Démarre une acquisition 3D en arrière-plan"""
     if scan_status["status"]:
@@ -252,10 +252,12 @@ def start_acquisition():
     
     except Exception as e:
         scan_status["status"] = False  # Réinitialiser l'état d'acquisition en cas d'erreur
-        scan_status["step"] = 0  # Réinitialiser l'étape d'ac
+        scan_status["step"] = 0  # Réinitialiser l'étape d'acquisition
         scan_status["ackDone"] = False  # Réinitialiser l'état d'acquision
         logger.error(f"Erreur lors du démarrage de l'acquisition: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
+    
+    
 # route pour vérifier si une acquisition est en cours
 @app.route('/acquisition-status', methods=['GET'])
 def acquisition_status():
@@ -272,7 +274,7 @@ def acquisition_status():
     
     
 # Route pour annuler l'acquisition en cours
-
+'''
 @app.route('/annuler-acquisition', methods=['POST'])
 def annuler_acquisition():
     try:
@@ -280,7 +282,7 @@ def annuler_acquisition():
         return jsonify({"status": "success", "message": "Acquisition annulée"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
+'''
 
 # Get ou POst
 @app.route('/camera/video_feed')
