@@ -39,13 +39,13 @@ installDir="$workDir/network-setup"
 logDir="$installDir/log"
 execDir="$installDir/bin"
 downloadDir="$installDir/downloads"
-netStartFile="$execDir/netStart.sh"
-netStopFile="$execDir/netStop.sh"
+netStartFile="$execDir/netStart"
+netStopFile="$execDir/netStop"
 netLogFile="$logDir/network.log"
 netStopServiceFile="/etc/systemd/system/netStop.service"
 netStationConfigFile="/etc/network/interfaces.d/station"
 netShutdownFlagFile="$logDir/netShutdownFlag"
-shutdownRecoveryFile="$execDir/shutdownRecovery.sh"
+shutdownRecoveryFile="$execDir/shutdownRecovery"
 rcLocalLogFile="$logDir/rc.local.log"
 
 rebootFlag=true
@@ -85,64 +85,7 @@ function setWlanDetails()
 
 setWlanDetails
 
-# REFERENCE: https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses
-# Visit above site to know more about Reserved Private IP Address for LAN/WLAN communication.
-function validIpAddress()
-{
-    local  ip=$1
-    local  status=1
-    if [[ $ip =~ ^(10|172|192)\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-        
-        IFS='.' read ipi1 ipi2 ipi3 ipi4 <<< "$ip"
-        IFS='.' read -r -a wlanIpMaskArr <<< "$wlanIpMask"
-        IFS='.' read -r -a wlanIpAddrArr <<< "$wlanIpAddr"
-        
-        wlanIpStartWith=""
-        wlanIpStartWithCount=0
-        
-        for i in ${!wlanIpMaskArr[@]}; do
-	        mskVal=${wlanIpMaskArr[$i]}
-            if [ $mskVal == 255 ]; then
-                if [ -z "$wlanIpStartWith" ]; then
-                    wlanIpStartWith="${wlanIpAddrArr[$i]}"
-                else
-                    wlanIpStartWith="$wlanIpStartWith.${wlanIpAddrArr[$i]}"
-                fi
-                wlanIpStartWithCount=$((wlanIpStartWithCount+1))
-            fi
-        done
-        
-        wlanIpStartWith="$wlanIpStartWith."
-        
-        case $ipi1 in
-        10) 
-            [[ ( $ip != $wlanIpAddr && ! $ip =~ ${wlanIpStartWith}* ) && \
-                ((${#ipi2} -eq 1 && ${ipi2} -le 255) || (${#ipi2} -gt 1 && "${ipi2}" != 0* && ${ipi2} -le 255)) && \
-                ((${#ipi3} -eq 1 && ${ipi3} -le 255) || (${#ipi3} -gt 1 && "${ipi3}" != 0* && ${ipi3} -le 255)) && \
-                ((${#ipi4} -eq 1 && ${ipi4} -le 255) || (${#ipi4} -gt 1 && "${ipi4}" != 0* && ${ipi4} -le 255))
-             ]]
-            status=$?
-        ;;
-        172) 
-            [[  ( $ip != $wlanIpAddr && ! $ip =~ ${wlanIpStartWith}* ) && \
-                ("${ipi2}" != 0* && ${ipi2} -ge 16 && ${ipi2} -le 31) && \
-                ((${#ipi3} -eq 1 && ${ipi3} -le 255) || (${#ipi3} -gt 1 && "${ipi3}" != 0* && ${ipi3} -le 255)) && \
-                ((${#ipi4} -eq 1 && ${ipi4} -le 255) || (${#ipi4} -gt 1 && "${ipi4}" != 0* && ${ipi4} -le 255))
-             ]]
-            status=$?
-        ;;
-        192) 
-            [[  ( $ip != $wlanIpAddr && ! $ip =~ ${wlanIpStartWith}* ) && \
-                ("${ipi2}" != 0* && ${ipi2} -eq 168) && \
-                ((${#ipi3} -eq 1 && ${ipi3} -le 255) || (${#ipi3} -gt 1 && "${ipi3}" != 0* && ${ipi3} -le 255)) && \
-                ((${#ipi4} -eq 1 && ${ipi4} -le 255) || (${#ipi4} -gt 1 && "${ipi4}" != 0* && ${ipi4} -le 255))
-             ]]
-            status=$?
-        ;;
-        esac
-    fi
-    return $status
-}
+
 
 # Check first if a valid --wifi-interface name option is provided or not. 
 # If a valid --wifi-interface name option is provided then, reset the WLAN details
