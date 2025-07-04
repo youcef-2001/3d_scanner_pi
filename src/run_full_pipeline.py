@@ -33,12 +33,12 @@ def workflow():
         'density_threshold': 0.15,
         'smooth_iterations': 5
     }
-    absolutepath_stl_file = os.path.join(working_directory,f"{signature}.stl")
-    mesh = reconstruct_3d_mesh(absolute_path_export_file, absolutepath_stl_file, config)
-
+    #absolutepath_stl_file = os.path.join(working_directory,f"{signature}.stl")
+    #mesh = reconstruct_3d_mesh(absolute_path_export_file, absolutepath_stl_file, config)
+    # changer le workflow car le mesh est tres Couteux au CPU cause crash
     # 4. Upload vers Supabase
-    if mesh and os.path.exists(absolutepath_stl_file):
-        upload_stl_to_supabase(absolutepath_stl_file)
+    if True and os.path.exists(absolute_path_export_file):
+        upload_stl_to_supabase(absolute_path_export_file)
 
 if __name__ == "__main__":
     workflow()

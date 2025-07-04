@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, Response, request
 from supabase import create_client, Client
 
+from reconstruction.utils import apply_filter , HSV_FILTRE, RGB_FILTRE
 from services.cameraManager import CameraManager
 from services.TfLunaI2C import TfLunaI2C
 from services.laserService import setup, turn_on_laser, turn_off_laser, cleanup
@@ -58,14 +59,17 @@ def generate_mjpeg(camera_manager: CameraManager):
                         break
                     # Capture de l'image
                     frame = camera_manager.capture_array()
-                    
+                    apply_filter(frame, 'HSV', *HSV_FILTRE)
+                    apply_filter(frame, 'RGB', *RGB_FILTRE)
                     # Conversion RGB vers BGR pour OpenCV
                     frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    
                     # Rotation de 90 degrés (sens horaire)
                     frame_bgr = cv2.rotate(frame_bgr, cv2.ROTATE_180)
                     # Encodage JPEG avec qualité optimisée
                     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]  # Qualité 80 ne pas charger le CPU
                     ret, jpeg = cv2.imencode('.jpg', frame_bgr, encode_param)
+                    
                     
                     if not ret:
                         continue
