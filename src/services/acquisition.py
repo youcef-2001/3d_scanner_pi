@@ -10,6 +10,7 @@ import time
 
 username = getpass.getuser()
 isScanning = False
+scan_number = 0# serial number to identify the scan
 
 def Stop_Scan():
     global isScanning
@@ -18,29 +19,32 @@ def Stop_Scan():
     isScanning = False
     
 
-def Scan_3D():
+def Scan_3D(logger=logging.getLogger(__name__)):
+    global scan_number
+    scan_number += 1
     global isScanning
     isScanning = True
+    save_dir = ''
+    csv_file = ''
     try:
         setup()
         tf = TfLunaI2C()
         tf.us = False
-        timestamp = datetime.now().strftime("acquisition_%d_%m_%H_%M")
-        save_dir = os.path.join(f"/home/{username}/images", timestamp)
+        signature = datetime.now().strftime(f"acquisition_%d_%m_%H_{scan_number:02d}")
+        save_dir = os.path.join(f"/home/{username}/images", signature)
         csv_file = os.path.join(save_dir, "distance_data.csv")
         os.makedirs(save_dir, exist_ok=True)
         with open(csv_file, "a") as f:
             f.write(f"# Index,Distance (cm),Amplitude,Temperature (°C),Ticks,Error\n")
 
-        picammanager = CameraManager.get_instance( logging.getLogger(__name__))
-        mytransform = Transform(rotation=180)
-        config = {"main":{"size": (1280, 1280)}, "transform":mytransform,"format": "RGB888"}
+        picammanager = CameraManager.get_instance(logger=logger)
+        config = {"main":{"size": (1280, 1280)}}
         picammanager.start_camera(config)
         time.sleep(0.5)
         i = 0
         temps_Deb = time.time()
         turn_on_laser()
-        print("🔴 Laser allumé !")
+        logger.info("🔴 Laser allumé !")
         tfluna_acqu = []
 
         while isScanning and time.time() - temps_Deb < 30:
@@ -48,26 +52,29 @@ def Scan_3D():
             picammanager.capture_file(filename)
             distance, amplitude, temperature, ticks, error = tf.read_data()
             tfluna_acqu.append((distance, amplitude, temperature, ticks, error))
-            print(f"📷 Image {i:05d} capturée - Distance : {distance} cm")
-            print(f"⏱ Temps écoulé : {time.time() - temps_Deb:.2f} s")
+            logger.info(f"📷 Image {i:05d} capturée - Distance : {distance} cm")
+            logger.info(f"⏱ Temps écoulé : {time.time() - temps_Deb:.2f} s")
             i += 1
 
-        print("✅ Fin de capture.")
+        logger.info("✅ Fin de capture.")
 
         with open(csv_file, "a") as f:
             for j, (distance, amplitude, temperature, ticks, error) in enumerate(tfluna_acqu):
                 f.write(f"{j:05d},{distance},{amplitude},{temperature},{ticks},{error}\n")
 
     except KeyboardInterrupt:
-        print("🛑 Arrêt par l'utilisateur.")
+        logger.error("🛑 Arrêt par l'utilisateur.")
 
     finally:
         turn_off_laser()
-        print("💡 Laser éteint.")
+        logger.info("💡 Laser éteint.")
         picammanager.stop_camera()
-        print("📷 Caméra arrêtée.")
+        logger.info("📷 Caméra arrêtée.")
         cleanup()
-        print("✅ Nettoyage terminé.")
+        logger.info("✅ Nettoyage terminé.")
+        isScanning = False
+        logger.info(f"📁 Images sauvegardées dans : {save_dir}")
+        return save_dir,csv_file
 
 if __name__ == "__main__":
     print("🔍 Démarrage de la numérisation 3D...")

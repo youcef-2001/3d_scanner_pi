@@ -8,7 +8,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
-from acquisition import Scan_3D, Stop_Scan 
+from acquisition import  Stop_Scan 
+from ...src.run_full_pipeline import workflow as Scan_3D
 from supabase import create_client, Client
 import logging
 import cv2

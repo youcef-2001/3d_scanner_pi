@@ -1,13 +1,29 @@
-from services.acquisition import Scan_3D
+from services.acquisition import Scan_3D 
 from reconstruction.mesh_speed import reconstruct_3d_mesh
+from  reconstruction.build3d import Build_3D_Cloud 
+from reconstruction.utils import RGB_FILTRE ,HSV_FILTRE
 from uploadstl.upload_stl import upload_stl_to_supabase
 import os
+import logging
 
 def workflow():
+    
+    logger = logging.getLogger(__name__)
     # 1. Acquisition & Build : génère 3d_object.xyz et 3d_object.stl bruts
-    Scan_3D()  # ou build.main() selon ton organisation
+    AcquDirectory,csvFile= Scan_3D(logger=logger)
+    # 2. Construction du nuage de points 3D
+    working_directory = os.path.dirname(os.path.abspath(__name__))
+    #extract the last directory from scan directory
+    signature= os.path.basename(AcquDirectory)
+    absolute_path_export_file = os.path.join(working_directory,f"{signature}.xyz")
+    ## a changer plus tard ///////////
+    rgb_filter=  RGB_FILTRE
+    # a changer plus tard ////////////
+    hsv_filter= HSV_FILTRE
+    Build_3D_Cloud(AcquDirectory, absolute_path_export_file, 
+                   rgb_filter=rgb_filter, hsv_filter=hsv_filter, logger=logger)
 
-    # 2. Mesh Creation STL (mesh amélioré)
+    # 3. Mesh Creation STL (mesh amélioré)
     config = {
         'voxel_size': 0.0004,
         'nb_neighbors': 15,
@@ -17,13 +33,12 @@ def workflow():
         'density_threshold': 0.15,
         'smooth_iterations': 5
     }
-    xyz_file = "./3d_object.xyz"
-    stl_file = "./3d_object_final.stl"
-    mesh = reconstruct_3d_mesh(xyz_file, stl_file, config)
+    absolutepath_stl_file = os.path.join(working_directory,f"{signature}.stl")
+    mesh = reconstruct_3d_mesh(absolute_path_export_file, absolutepath_stl_file, config)
 
-    # 3. Upload vers Supabase
-    if mesh and os.path.exists(stl_file):
-        upload_stl_to_supabase(stl_file)
+    # 4. Upload vers Supabase
+    if mesh and os.path.exists(absolutepath_stl_file):
+        upload_stl_to_supabase(absolutepath_stl_file)
 
 if __name__ == "__main__":
     workflow()

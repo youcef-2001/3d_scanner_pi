@@ -1,20 +1,23 @@
-from utils import *
+from utils import apply_filter, get_camera_coordinates, camerapoint_to_centerpoint, IMAGE_FOLDER, HSV_FILTRE, RGB_FILTRE
 import os
 import cv2
 import numpy as np
-import open3d as o3d
+import logging
 
 
-if __name__ == "__main__":
+def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,logger=logging.getLogger(__name__)):
+    """    Fonction pour construire un nuage de points 3D à partir d'images
+    """
+    # === Chemin du dossier contenant les images ===
     # === Vérifier si le dossier existe ===
-    if not os.path.exists(IMAGE_FOLDER):
-        print(f"❌ Le dossier {IMAGE_FOLDER} n'existe pas.")
+    if not os.path.exists(AcquisitionDirectory):
+        logger.error(f"❌ Le dossier {AcquisitionDirectory} n'existe pas.")
         exit(1)
 
         # === Lister les fichiers d'image dans le dossier ===
     image_files = sorted([
-        os.path.join(IMAGE_FOLDER, f)
-        for f in os.listdir(IMAGE_FOLDER)
+        os.path.join(AcquisitionDirectory, f)
+        for f in os.listdir(AcquisitionDirectory)
         if f.lower().endswith(('.jpg', '.png', '.jpeg', '.bmp'))
     ])
 
@@ -24,15 +27,13 @@ if __name__ == "__main__":
     """ les coords de la camera fixe seront prochainement en fonction
     de la profondeur  , hauteur et angle de capture par rapport au 
     centre de rotation"""
-    
     camera_coords = get_camera_coordinates(degree)
-    
-    
     ''' notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete
     # ayant 15.2 FPS
     # donc 13.6 secondes * 15.2 FPS =  207.2 images
     # donc 234 images pour une rotation de 360°'''
+    cv2.setNumThreads(3)  # mettre au max de thread d'un raspberry pi 3 -(minus) le thread Flask
     while  i < len(image_files):
         image_path = image_files[i]
         # Calculer le degré de rotation pour chaque image
@@ -42,14 +43,14 @@ if __name__ == "__main__":
         frame = cv2.imread(image_path)
         frame = cv2.rotate(frame, cv2.ROTATE_180)
         if frame is None:
-            print(f"❌ Impossible de lire l'image {image_path}.")
+            logger.error(f"❌ Impossible de lire l'image {image_path}.")
             i += 1
             continue
         # === Appliquer le filtre HSV ===
-        hsv_result = apply_filter(frame, 'HSV', *HSV_FILTRE)
+        hsv_result = apply_filter(frame, 'HSV', *hsv_filter)
         # === Appliquer le filtre RGB ===
-        rgb_result = apply_filter(hsv_result, 'RGB', *RGB_FILTRE)
-        print(f"✅ Image {image_path} traitée avec succès.")
+        rgb_result = apply_filter(hsv_result, 'RGB', *rgb_filter)
+        logger.info(f"✅ Image {image_path} traitée avec succès.")
         coords_per_pixel = []
         # taille de l'image
         height, width = frame.shape[:2]
@@ -57,59 +58,37 @@ if __name__ == "__main__":
         ys, xs = np.where(np.any(rgb_result != [0, 0, 0], axis=-1))
         myzip = list(zip(xs, ys))  # Liste des pixel de l'image courante
         if myzip.__len__ == 0:
-            print(f"❌ Aucune coordonnée valide trouvée dans l'image {image_path}.")
+            logger.error(f"❌ Aucune coordonnée valide trouvée dans l'image {image_path}.")
             continue
         else:    
             for x,y in myzip :
                         x,y,z= camerapoint_to_centerpoint(camera_coords,x,y,width, height,degree)
                         coords_per_pixel.append((x, y, z))
             coords_per_image.append(coords_per_pixel)
-            
+        cv2.setNumThreads(1)  # Réinitialiser le nombre de threads pour éviter les problèmes de performance  
         i += 1
         
     #Rotation Totale , translation totale
-
-    
     # sauvegarder dans un fichier xyz pour visualiser avec open3d
-    xyz_file_path = os.path.join('./', "3d_object.xyz")
-    with open(xyz_file_path, 'w') as xyz_file:
+    
+    with open(exportFileAbsolutePath, 'w') as xyz_file:
         for img_coords in coords_per_image:
             for coord in img_coords:
                 xyz_file.write(f"{coord[0]} {coord[1]} {coord[2]}\n")
                 
-    ## add normals  in the point cloud 
-    
-    
-    
-    print(f"✅ Fichier XYZ créé avec succès : {xyz_file_path}")
-    
-    # cree un fichier STL
-    
- 
-
-    # 1. Charger le nuage de points depuis un fichier .xyz
-    pcd = o3d.io.read_point_cloud("./3d_object.xyz", format='xyz')
-
-    # 2. (Optionnel) Downsampling et nettoyage
-    pcd = pcd.voxel_down_sample(voxel_size=0.0045)
-    pcd.remove_statistical_outlier(nb_neighbors=10, std_ratio=2.2)
-
-    # 3. Estimer les normales pour la reconstruction
-    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamKNN(knn=10))
-    pcd.orient_normals_consistent_tangent_plane(k=8)
-
-    # 4. Reconstruction du mesh avec Poisson
-    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=10)
-
-    # 5. Découper le mesh aux limites du nuage de points
-    bbox = pcd.get_axis_aligned_bounding_box()
-    mesh = mesh.crop(bbox)
-    mesh.compute_vertex_normals()
-    # 6. Exporter au format STL (⚠️: STL ne gère pas la couleur ou texture)
-    o3d.io.write_triangle_mesh("./3d_object.stl", mesh)
-
-    print("✅ Mesh STL exporté avec succès !")
+    logger.info(f"✅ Fichier XYZ créé avec succès : {exportFileAbsolutePath}")
 
         
         
 
+if __name__ == "__main__":
+    # === Chemin du dossier contenant les images ===
+    EXPORT_FILE_NAME = "3d_object.xyz"
+    
+    # === Vérifier si le dossier existe ===
+    if not os.path.exists(IMAGE_FOLDER):
+        print(f"❌ Le dossier {IMAGE_FOLDER} n'existe pas.")
+        exit(1)
+    
+    # === Construire le nuage de points 3D ===
+    Build_3D_Cloud(IMAGE_FOLDER, EXPORT_FILE_NAME)
