@@ -523,7 +523,7 @@ chmod ug+x $shutdownRecoveryFile
 
 # Create startup script
 cat > $netStartFile <<EOF
-
+#!/bin/bash
 # Check shutdown flag file exists for proper last time shutdown 
 # and if last time shutdown did not happen properly then reboot to make sure that, 
 # netStop.service properly do the necessary things before shutdown:
@@ -599,7 +599,7 @@ doAddApIpEntriesToHostFile
 systemctl unmask hostapd
 
 cat > $netStopFile <<EOF
-#! /bin/bash
+#!/bin/bash
 
 sudo systemctl stop hostapd
 sudo systemctl stop dnsmasq
