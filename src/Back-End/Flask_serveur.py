@@ -190,7 +190,7 @@ def read_tfluna():
             "temperature_c": temperature,
             "ticks": ticks,
             "error": error
-        })
+        }), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
