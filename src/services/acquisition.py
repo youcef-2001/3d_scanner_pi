@@ -2,11 +2,8 @@ from cameraManager import CameraManager
 from picamera2.utils import Transform
 import logging
 from datetime import datetime
-import socket
 import getpass
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import time

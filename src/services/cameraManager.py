@@ -27,9 +27,9 @@ class CameraManager:
                 try:
                     self.picam2 = Picamera2()
                     if config == 'default':
-                        config = self.picam2.create_still_configuration(main={"size": (1080, 720)}, buffer_count=10)
+                        config = self.picam2.create_still_configuration(main={"size": (1280, 1280)}, buffer_count=10)
                     elif config == 'streaming':
-                        config = self.picam2.create_video_configuration(main={"size": (640, 480)}, buffer_count=10)
+                        config = self.picam2.create_video_configuration(main={"size": (720, 640)}, buffer_count=10)
                     elif isinstance(config, dict):
                         config = self.picam2.create_still_configuration(**config)
                     self.picam2.configure(config)

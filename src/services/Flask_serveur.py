@@ -4,18 +4,23 @@ from cameraManager import CameraManager
 from TfLunaI2C import TfLunaI2C
 from laserService import setup, turn_on_laser, turn_off_laser, cleanup
 import jwt
-from testAcquisition import Scan_3D, Stop_Scan 
+from services.acquisition import Scan_3D, Stop_Scan 
 from supabase import create_client, Client
 import logging
 import cv2
 import time
+from dotenv import load_dotenv
+import os
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
 
+# === URL ET CLÉ DE SUPABASE ===
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 
 
 app = Flask(__name__)
 # Configuration Supabase
-SUPABASE_URL = 'https://vwnbfnvwzfidaxfxcdqp.supabase.co'
-SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bmJmbnZ3emZpZGF4ZnhjZHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODM5NjcsImV4cCI6MjA2NTY1OTk2N30.0-vxz8pyP_KYN0TwKdlFz4k0DQlp-o16rmyQOrcLKa0'
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +59,7 @@ def generate_mjpeg(camera_manager: CameraManager):
                     # Rotation de 90 degrés (sens horaire)
                     frame_bgr = cv2.rotate(frame_bgr, cv2.ROTATE_180)
                     # Encodage JPEG avec qualité optimisée
-                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 85]  # Qualité 80 ne pas charger le CPU
+                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]  # Qualité 80 ne pas charger le CPU
                     ret, jpeg = cv2.imencode('.jpg', frame_bgr, encode_param)
                     
                     if not ret:
@@ -207,7 +212,7 @@ def wrapped_scan():
 def start_acquisition():
     global is_acquisition_running
     if is_acquisition_running:
-        return jsonify({"status": "error", "message": "Une acquisition est déjà en cours"}), 400
+        return jsonify({"status": "error", "message": "Une acquisition est déjà en cours"}), 403
     try:
         is_acquisition_running = True
         Thread(target=wrapped_scan).start()

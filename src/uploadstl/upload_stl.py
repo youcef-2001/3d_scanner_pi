@@ -2,14 +2,18 @@ import os
 import uuid
 from supabase import create_client, Client
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 
-# === CONFIGURATION SUPABASE ===
-SUPABASE_URL = 'https://vwnbfnvwzfidaxfxcdqp.supabase.co'
-SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bmJmbnZ3emZpZGF4ZnhjZHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODM5NjcsImV4cCI6MjA2NTY1OTk2N30.0-vxz8pyP_KYN0TwKdlFz4k0DQlp-o16rmyQOrcLKa0'
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
+# === URL ET CLÉ DE SUPABASE ===
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+# === IDENTIFIANTS D'AUTHENTIFICATION ===
+AUTH_EMAIL = os.getenv('AUTH_EMAIL')
+AUTH_PASSWORD = os.getenv('AUTH_PASSWORD')
 
-# === DONNÉES D'AUTHENTIFICATION ===
-AUTH_EMAIL = "ybaleh13@gmail.com"
-AUTH_PASSWORD = "test1234"
+
 
 # === NOM DU BUCKET STORAGE ===
 BUCKET_NAME = 'scans'

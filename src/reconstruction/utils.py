@@ -157,47 +157,4 @@ def camerapoint_to_centerpoint(cam_coords, px, py, width, height,theta):
 
 
 
-#le K donner par default est issue d'une precedente calibration de la camera
-def estimate_camera_poses(image_paths, K=np.array([[302.83777934, 0, 320],
-                                                   [0, 301.78118715, 240],
-                                                   [0, 0, 1]])):
-    poses = [np.eye(4)]  # première pose = identité (origine)
-    sift = cv2.SIFT_create()
-    FLANN_INDEX_KDTREE = 1
-    flann = cv2.FlannBasedMatcher(dict(algorithm=FLANN_INDEX_KDTREE, trees=5), dict(checks=50))
-    prev_img = cv2.imread(image_paths[0], cv2.IMREAD_GRAYSCALE)
-    kp1, des1 = sift.detectAndCompute(prev_img, None)
-    for idx in range(1, len(image_paths)):
-        curr_img = cv2.imread(image_paths[idx], cv2.IMREAD_GRAYSCALE)
-        kp2, des2 = sift.detectAndCompute(curr_img, None)
-
-        matches = flann.knnMatch(des1, des2, k=2)
-        good_matches = [m for m, n in matches if m.distance < 0.7 * n.distance]
-
-        pts1 = np.float32([kp1[m.queryIdx].pt for m in good_matches])
-        pts2 = np.float32([kp2[m.trainIdx].pt for m in good_matches])
-
-        # Matrice essentielle
-        E, mask = cv2.findEssentialMat(pts1, pts2, K, method=cv2.RANSAC, threshold=1.0)
-
-        # Rotation et translation relative
-        _, R, t, mask_pose = cv2.recoverPose(E, pts1, pts2, K)
-
-        # Construire la transformation homogène 4x4
-        T = np.eye(4)
-        T[:3, :3] = R
-        T[:3, 3] = t.flatten()
-
-        # Calculer la pose globale : pose_i = pose_{i-1} @ T
-        pose_i = poses[-1] @ T
-        poses.append(pose_i)
-
-        # Mettre à jour
-        kp1, des1 = kp2, des2
-        prev_img = curr_img
-
-    return poses  # Liste des matrices 4x4
-
-
-    
 

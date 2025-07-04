@@ -5,19 +5,25 @@ RPi.GPIO
 picamera2
 opencv-python
 opencv
-libcamera
 # server backend 
 flask
+open3d
+cv2
 #tf luna dep
 smbus
 pylint
 #python3-smbus 
 #read-edid
-
 #base de donne supabase 
 #python3 -m venv venv --system-site-packages
 #source venv/bin/activate
-#pip install supabase
 #python Flask_serveur.py
 "numpy<2"# car opencv2 semble etre compiler avce une ancienne version de numpy
 supabase
+dotenv
+glob
+getpass
+threading
+jwt
+logging
+

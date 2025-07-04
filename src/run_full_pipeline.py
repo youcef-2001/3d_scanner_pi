@@ -1,5 +1,5 @@
-from services.testAcquisition import Scan_3D
-from computing_3D.mesh_speed import reconstruct_3d_mesh
+from services.acquisition import Scan_3D
+from reconstruction.mesh_speed import reconstruct_3d_mesh
 from uploadstl.upload_stl import upload_stl_to_supabase
 import os
 
