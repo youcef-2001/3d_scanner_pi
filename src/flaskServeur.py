@@ -32,11 +32,13 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 camera_manager = CameraManager.get_instance(logger)
-is_acquisition_running= False
-acquisition_step = 0  # Étape d'acquisition pour le workflow
 stream_status = False  # Indique si le flux vidéo est actif
-ackDone = False  # Indique si l'acquision est terminée
 
+scan_status = {
+    "status": False,  # Indique si l'acquisition est en cours
+    "step": 0,  # Étape actuelle de l'acquisition
+    "ackDone": False  # Indique si l'acquision est terminée
+}
 #=======================
 #Live streaming
 #========================
@@ -213,26 +215,25 @@ def read_tfluna():
 #start_acquisition
 
 def wrapped_scan(uid,):
-    global is_acquisition_running 
-    global acquisition_step
-    global ackDone 
-    ackDone = False  # Réinitialiser l'état d'acquision
+    """Fonction d'acquisition 3D en arrière-plan"""
+    scan_status["status"] = True  # Acquisition en cours
+    scan_status["step"] = 0  # Étape d'acquisition initiale
+    scan_status["ackDone"] = False  # Acquisition non terminée
     try:
-        Scan_3D(uid,acquisition_step)
-        ackDone = True  # Acquisition terminée
+        Scan_3D(uid,scan_status=scan_status)  # Démarrer l'acquisition 3D
+        scan_status["ackDone"] = True  # Acquisition terminée
     finally:
-        acquisition_step = 0  # Réinitialiser l'étape d'acquisition après la fin de l'acquisition
-        is_acquisition_running = False  # Réinitialiser l'étape d'acquisition après la fin de l'acquisition
+        scan_status["status"] = False  # Acquisition terminée
+        scan_status["step"] = 0  # Réinitialiser l'étape d'acquisition
+        logger.info("Acquisition 3D terminée")
 # route post pour demarrer une aquisition qui necessite de recevoir un parametre user_id
 @app.route('/start-acquisition/', methods=['POST'])
 def start_acquisition():
-    global is_acquisition_running
-    global acquisition_step
     """Démarre une acquisition 3D en arrière-plan"""
     
     
     
-    if is_acquisition_running:
+    if scan_status["status"]:
         return jsonify({"status": "error", "message": "Une acquisition est déjà en cours"}), 403
     try:
         
@@ -245,26 +246,26 @@ def start_acquisition():
         user_id = payload.get("sub")
         if not user_id:
             return jsonify({"status": "error", "message": "ID utilisateur manquant"}), 400
-        is_acquisition_running = True
+        
         Thread(target=wrapped_scan, args=(user_id,), daemon=True).start()
         return jsonify({"status": "success", "message": "Acquisition démarrée"}), 200
     
     except Exception as e:
-        is_acquisition_running = False
-        acquisition_step = 0  # Réinitialiser l'étape d'acquisition en cas d'erreur
+        scan_status["status"] = False  # Réinitialiser l'état d'acquisition en cas d'erreur
+        scan_status["step"] = 0  # Réinitialiser l'étape d'ac
+        scan_status["ackDone"] = False  # Réinitialiser l'état d'acquision
+        logger.error(f"Erreur lors du démarrage de l'acquisition: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 # route pour vérifier si une acquisition est en cours
 @app.route('/acquisition-status', methods=['GET'])
 def acquisition_status():
     """Vérifie si une acquisition est en cours"""
-    global is_acquisition_running
-    global acquisition_step
-    global ackDone
-    
-   
-    return jsonify({"status": is_acquisition_running,
-                    "step" : acquisition_step if is_acquisition_running else 0,
-                    "ackDone": ackDone if is_acquisition_running else False
+    if scan_status["ackDone"]:
+        value = True#Envoie acknowledge pour le client une seule fois 
+        scan_status["ackDone"] = False  # Réinitialiser l'état d'acquision
+    return jsonify({"status": scan_status["status"],
+                    "step" : scan_status["step"],
+                    "ackDone": value,
                     }), 200
    
     
