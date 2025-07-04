@@ -1,11 +1,11 @@
-from testAcquisition import main as acquisition_main
-from mesh_speed import reconstruct_3d_mesh
-from upload_stl import upload_stl_to_supabase
+from services.testAcquisition import Scan_3D
+from computing_3D.mesh_speed import reconstruct_3d_mesh
+from uploadstl.upload_stl import upload_stl_to_supabase
 import os
 
 def workflow():
     # 1. Acquisition & Build : génère 3d_object.xyz et 3d_object.stl bruts
-    acquisition_main()  # ou build.main() selon ton organisation
+    Scan_3D()  # ou build.main() selon ton organisation
 
     # 2. Mesh Creation STL (mesh amélioré)
     config = {
