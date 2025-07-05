@@ -265,6 +265,7 @@ def start_acquisition():
         # get distance from body request
         data = request.get_json()
         distance = data.get("distance")
+        logger.info(f"Distance pour l'acquisition: {distance} cm")
         if not user_id:
             return jsonify({"status": "error", "message": "ID utilisateur manquant"}), 400
         

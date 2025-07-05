@@ -28,6 +28,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
     de la profondeur  , hauteur et angle de capture par rapport au 
     centre de rotation"""
     camera_coords = get_camera_coordinates(degree,0,0,(float(distance)+6.6)/100)#transform distance to meters and 6.5 is the radius of the platform
+    logger.info(f"📷 Coordonnées de la caméra : {camera_coords}")
     ''' notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete
     # ayant 15.2 FPS
