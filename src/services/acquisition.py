@@ -10,7 +10,7 @@ from services.cameraManager import CameraManager
 TIME= 30  # Durée de la numérisation en secondes
 username = getpass.getuser()
 isScanning = False
-scan_number = 0# serial number to identify the scan
+
 
 def Stop_Scan():
     global isScanning
@@ -19,9 +19,9 @@ def Stop_Scan():
     isScanning = False
     
 
-def Scan_3D(logger=logging.getLogger(__name__)):
-    global scan_number
-    scan_number += 1
+def Scan_3D(scan_number,logger=logging.getLogger(__name__) ):
+    
+    scan_number['serial'] += 1
     global isScanning
     isScanning = True
     save_dir = ''

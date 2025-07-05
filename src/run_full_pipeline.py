@@ -15,7 +15,7 @@ def workflow(user_ID,distance,scan_status, token,rgb_filter=RGB_FILTRE, hsv_filt
     # et de la reconstruction 3D
     scan_status['step'] = 1
     
-    AcquDirectory,csvFile,fps= Scan_3D(logger=logger)
+    AcquDirectory,csvFile,fps= Scan_3D(scan_status,logger=logger)
     # 2. Construction du nuage de points 3D
     working_directory = os.path.dirname(os.path.abspath(__name__))
     #extract the last directory from scan directory

@@ -37,7 +37,8 @@ stream_status = False  # Indique si le flux vidéo est actif
 scan_status = {
     "status": False,  # Indique si l'acquisition est en cours
     "step": 0,  # Étape actuelle de l'acquisition
-    "ackDone": False  # Indique si l'acquision est terminée
+    "ackDone": False,  # Indique si l'acquision est terminée
+    "serial": 0  # Numéro de série pour identifier l'acquisition
 }
 rgb_FILTRE = {
         'redLow': 0,
