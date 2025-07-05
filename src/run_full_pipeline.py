@@ -31,11 +31,11 @@ def workflow(user_ID,distance,scan_status, token,rgb_filter=RGB_FILTRE, hsv_filt
     config = {
         'voxel_size': 0.0004,      # Plus petit = plus de détails
         'nb_neighbors': 15,       # Plus élevé = nettoyage plus strict
-        'std_ratio': 1.5,         # Plus bas = nettoyage plus agressif
-        'normal_knn': 15,         # Plus élevé = normales plus lisses
-        'poisson_depth': 12,      # Plus élevé = plus de détails
+        'std_ratio': 2.0,         # Plus bas = nettoyage plus agressif
+        'normal_knn': 16,         # Plus élevé = normales plus lisses
+        'poisson_depth': 10,      # Plus élevé = plus de détails
         'density_threshold': 0.15, # Plus élevé = plus de filtrage
-        'smooth_iterations': 5     # Lissage final
+        'smooth_iterations': 2     # Lissage final
     }
     scan_status['step'] += 1  # Increment step for tracking progress
     stl_absolute_path = absolute_path_export_file.replace('.xyz', '.stl')

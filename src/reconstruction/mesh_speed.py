@@ -101,15 +101,6 @@ def reconstruct_3d_mesh(input_file, output_file, config,logger= logging.getLogge
     # 10. Calcul des normales du mesh
     logger.info("🧮 Calcul des normales du mesh...")
     mesh.compute_vertex_normals()
-    
-    # 11. Validation du mesh
-    logger.info("🔍 Validation du mesh...")
-    if not mesh.is_watertight():
-        logger.warning("⚠️  Le mesh n'est pas étanche (watertight)")
-    
-    if not mesh.is_orientable():
-        logger.warning("⚠️  Le mesh n'est pas orientable")
-    
     # 12. Export avec gestion d'erreur
     logger.info("💾 Export du mesh...")
     try:
