@@ -27,18 +27,20 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
     """ les coords de la camera fixe seront prochainement en fonction
     de la profondeur  , hauteur et angle de capture par rapport au 
     centre de rotation"""
-    camera_coords = get_camera_coordinates(degree,0,0,(float(distance)+6.6)/100)#transform distance to meters and 6.5 is the radius of the platform
+    camera_coords = get_camera_coordinates(degree,0,0,-(float(distance)+6.6)/100)#transform distance to meters and 6.5 is the radius of the platform
     logger.info(f"📷 Coordonnées de la caméra : {camera_coords}")
     ''' notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete
     # ayant 15.2 FPS
     # donc 13.6 secondes * 15.2 FPS =  207.2 images
     # donc 234 images pour une rotation de 360°'''
+    fps_tour =int (fps_on_acqu * 14.3)  # Nombre d'images pour une rotation complète
+    logger.info(f"⏱️ Nombre d'images pour une rotation complète : {  fps_tour}")
     while  i < len(image_files):
         image_path = image_files[i]
         # Calculer le degré de rotation pour chaque image
         # Supposons 234 images pour une rotation complète de 360°
-        degree = (i * 360) / int(fps_on_acqu * 14.3)
+        degree = (i * 360) / fps_tour
         # === Lire l'image ===
         frame = cv2.imread(image_path)
         frame = cv2.rotate(frame, cv2.ROTATE_180)
