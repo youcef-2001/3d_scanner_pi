@@ -31,7 +31,7 @@ def Scan_3D(scan_number,logger=logging.getLogger(__name__) ):
         setup()
         tf = TfLunaI2C()
         tf.us = False
-        signature = datetime.now().strftime(f"acquisition_%d_%m_%H_{scan_number:02d}")
+        signature = datetime.now().strftime(f"acquisition_%d_%m_%H_{scan_number['serial']:02d}")
         save_dir = os.path.join(f"/home/{username}/images", signature)
         csv_file = os.path.join(save_dir, "distance_data.csv")
         os.makedirs(save_dir, exist_ok=True)
