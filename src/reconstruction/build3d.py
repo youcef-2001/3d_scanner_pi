@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import logging
 
-
+TF_LUNA_ERROR = 2 # in cm, error of the TF Luna sensor, to be adjusted based on calibration
 def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FILTRE, rgb_filter=RGB_FILTRE,fps_on_acqu=15,distance =DISTANCE_CAMERA_ROTATION_CENTER ,logger=logging.getLogger(__name__)):
     """    Fonction pour construire un nuage de points 3D à partir d'images
     """
@@ -27,7 +27,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
     """ les coords de la camera fixe seront prochainement en fonction
     de la profondeur  , hauteur et angle de capture par rapport au 
     centre de rotation"""
-    camera_coords = get_camera_coordinates(degree,0,0,-(float(distance)+7))#transform distance to meters and 7 is the radius of the platform + some error
+    camera_coords = get_camera_coordinates(degree,0,0,-(float(distance)+6.8+TF_LUNA_ERROR))#transform distance to meters and 6.8 is the radius of the platform + some error
     logger.info(f"📷 Coordonnées de la caméra : {camera_coords}")
     ''' notre plateforme tourne a 4 rotation par minute
     # donc 15 secondes pour une rotation complete

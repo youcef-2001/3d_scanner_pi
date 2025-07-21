@@ -14,7 +14,7 @@ HSV_FILTRE= (0, 0, 190, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 RGB_FILTRE = (0, 40, 40, 255, 255, 255) # (l1,l2,l3,h1,h2,h3)
 FOCALE = 0.36 # in cm, focal length of the camera
 PIXEL_SIZE=1.4e-4 # in cm, size of a pixel in the camera sensor
-DISTANCE_CAMERA_ROTATION_CENTER = 38.4 # in cm, distance between the camera and the rotation center of the platform
+DISTANCE_CAMERA_ROTATION_CENTER = 30 # in cm, distance between the camera and the rotation center of the platform
 DEGREE_CAMERA_ROTATION_AXES = 0 # in degree, the camera rotates around the Y axis of the platform
 HEIGHT_CAMERA_ROTATION_CENTER = 0 # in cm, height of the camera from the rotation center of the platform
 
@@ -142,14 +142,14 @@ def camerapoint_to_centerpoint(cam_coords, px, py, width, height,theta):
     
     # la camera est legerement incliné par rapport a l'axe X de la plateforme
     # donc on applique une rotation autour de l'axe X pour corriger l'inclinaison
-    R_x = np.array([
+    '''R_x = np.array([
         [1, 0, 0],
         [0, np.cos(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES)), -np.sin(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES))],
         [0, np.sin(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES)), np.cos(np.deg2rad(DEGREE_CAMERA_ROTATION_AXES))]
-    ])
+    ])'''
     # Calcul de la position dans le repère O
     # il translate puis le fait tourner
-    P_O = R_y @ (R_x @ P_C + t_C_to_O)  # Appliquer la rotation et la translation
+    P_O = R_y @ (P_C + t_C_to_O) # Appliquer la rotation et la translation
     # return un tuple x,y,z
     return P_O[0, 0], P_O[1, 0], P_O[2, 0]  # Retourne les coordonnées (x, y, z) dans le repère O
 
