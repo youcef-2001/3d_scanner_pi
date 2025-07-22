@@ -34,7 +34,7 @@ def Build_3D_Cloud(AcquisitionDirectory,exportFileAbsolutePath,hsv_filter=HSV_FI
     # ayant 15.2 FPS
     # donc 13.6 secondes * 15.2 FPS =  207.2 images
     # donc 234 images pour une rotation de 360°'''
-    fps_tour =int (fps_on_acqu * 14.1)  # Nombre d'images pour une rotation complète
+    fps_tour =int (fps_on_acqu * 14)  # Nombre d'images pour une rotation complète
     logger.info(f"⏱️ Nombre d'images pour une rotation complète : {  fps_tour}")
     while  i < len(image_files):
         image_path = image_files[i]
