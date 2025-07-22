@@ -134,6 +134,10 @@ Le processus complet de numérisation comprend les étapes suivantes:
 4. **Génération du maillage**: Transformation du nuage de points en maillage 3D lissé (format STL)
 5. **Sauvegarde et téléchargement**: Enregistrement local du modèle 3D et téléchargement vers le dossier utilisateur sur Supabase
 
+#### Exemple de nuages de points 3D :
+![alt text](banane.png "Nuage de Points Banane avec open3d")
+#### Exemple de fichiers STL cree :
+![alt text](mug.png "Mesh Mug ouvert sur Blender")
 ## Paramètres de configuration
 
 ### Paramètres du scanner
