@@ -17,7 +17,7 @@ PIXEL_SIZE=1.4e-4 # in cm, size of a pixel in the camera sensor
 DISTANCE_CAMERA_ROTATION_CENTER = 30 # in cm, distance between the camera and the rotation center of the platform
 DEGREE_CAMERA_ROTATION_AXES = 0 # in degree, the camera rotates around the Y axis of the platform
 HEIGHT_CAMERA_ROTATION_CENTER = 0 # in cm, height of the camera from the rotation center of the platform
-
+TIME_PER_TOUR = 13.8 # in seconds, time for a complete rotation of the platform
 
 # === Appliquer le filtre  HSV ou RGB ===
 def apply_filter(img, mode,l1=0, l2=0, l3=0, h1=255, h2=255, h3=255):
